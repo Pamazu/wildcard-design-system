@@ -1,0 +1,29 @@
+/* dashboard-edits.css — auto-managed by the v2 Dashboard Edit Tool.
+ *
+ * Rules in this file were created by clicking elements in the Edit Tool
+ * (Dashboard.jsx, Edit mode) and changing properties. Each rule is wrapped
+ * in /*EDIT:<key>*\/ ... /*\/EDIT*\/ marker comments so the persistence
+ * middleware can find + rewrite a single rule without disturbing others.
+ *
+ * Cascade: this file is imported LAST in main.jsx so its rules win over
+ * component-intrinsic CSS without requiring extra specificity. To "promote"
+ * an edit into its component CSS, copy the rule into the component .css
+ * file and delete the block here (or just delete to revert).
+ *
+ * Do not hand-edit unless you know what you're doing — the Edit Tool's
+ * round-trip parser expects the exact marker format above. */
+/*EDIT:.hero.wc-bgline::padding-top*/
+.hero.wc-bgline { padding-top: 194px; }
+/*/EDIT*/
+/*EDIT:.hero.wc-bgline::margin-top*/
+.hero.wc-bgline { margin-top: 0px; }
+/*/EDIT*/
+/*EDIT:.nl-solid::color*/
+.nl-solid { color: #000000; }
+/*/EDIT*/
+/*EDIT:.inner::padding-top*/
+.inner { padding-top: 64px; }
+/*/EDIT*/
+/*EDIT:.wc-form.nl-form::width*/
+.wc-form.nl-form { width: fit-content; }
+/*/EDIT*/

@@ -1,0 +1,7 @@
+/* reset.css — minimal base reset. Tokens + box-sizing only;
+ * full normalize is unnecessary for a controlled-content site. */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+img, svg, video { display: block; max-width: 100%; }
+button { font: inherit; cursor: pointer; }
+a { color: inherit; }

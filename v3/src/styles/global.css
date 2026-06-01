@@ -1,0 +1,41 @@
+/* global.css — page-level + cross-component utilities.
+ * Only put CSS here that's used by MORE THAN ONE component, or that
+ * needs to address the whole document (body bg, html overflow, etc).
+ * Per-component CSS lives in <Component>/<Component>.module.css.
+ */
+
+html { overflow-x: clip; }
+body {
+  margin: 0;
+  background-color: var(--wc-cream-soft);
+  background-image: url('/assets/grain-texture-page.png');
+  background-repeat: repeat;
+  background-attachment: fixed;
+  font-family: var(--font-body);
+  color: var(--wc-ink);
+  overflow-x: clip;
+}
+
+/* Shared helpers — used by Hero, Games, Connected, Footer */
+.deco {
+  display: inline-flex;
+  gap: 0.015em;
+  vertical-align: baseline;
+}
+.deco span {
+  display: inline-block;
+  line-height: 1;
+}
+.deco span:nth-child(odd)  { transform: translateY(-6px); }
+.deco span:nth-child(even) { transform: translateY( 4px); }
+.deco span:nth-child(5n+1) { color: var(--wc-yellow); }
+.deco span:nth-child(5n+2) { color: var(--wc-blue);   }
+.deco span:nth-child(5n+3) { color: var(--wc-red);    }
+.deco span:nth-child(5n+4) { color: var(--wc-purple); }
+.deco span:nth-child(5n+5) { color: var(--wc-green);  }
+
+.section-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 80px;
+}

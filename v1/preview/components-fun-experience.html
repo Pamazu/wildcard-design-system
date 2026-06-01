@@ -1,0 +1,386 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8">
+<title>Fun Experience</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+/* =========================================================================
+   FUN EXPERIENCE TESTIMONIALS — Wildcard
+
+   A horizontal slider of dark testimonial cards. Each card is a black
+   panel with film-strip sprocket cutouts along the top and bottom edges
+   (cream-pale squares biting into the dark surface), evoking the
+   playing-card / filmstrip visual language. Cards reveal:
+     - Title (Roc Grotesk Wide 500, 50/55, white)
+     - 5 brand star badges (the exact yellow-square-with-black-asterisk
+       icon from assets/icons/star.svg)
+     - Quote body (Montserrat 500, white)
+     - Reviewer attribution (Montserrat 700, white)
+
+   Slider: prev / next red pill arrows between the centered card and
+   the adjacent partial cards. Click to advance; the track translates.
+
+   No top / bottom checker bands per design feedback — the perforation
+   IS the band.
+   ========================================================================= */
+body {
+  margin: 0;
+  background: var(--wc-white);
+  font-family: var(--font-body);
+  padding: 60px 0;
+}
+
+.fe-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Track holds all cards side-by-side; transform shifts them. */
+.fe-track {
+  --fe-card-w: 540px;
+  --fe-card-gap: 70px;
+  display: flex;
+  gap: var(--fe-card-gap);
+  transition: transform 380ms cubic-bezier(0.2, 0.65, 0.2, 1);
+  will-change: transform;
+}
+
+/* ── Card ───────────────────────────────────────────────────────────
+   Black panel with cream sprocket cutouts top + bottom. Width ~540,
+   height fills content + 32px top/bottom padding for perforation
+   breathing room. */
+.fe-card {
+  position: relative;
+  flex: none;
+  width: var(--fe-card-w, 540px);
+  --fe-teeth: 6;          /* number of notches (cream rectangles)          */
+  --fe-tooth-w: 75px;     /* notch width — wide rectangles, narrow teeth  */
+  --fe-tooth-h: 22px;     /* notch depth (vertical)                       */
+  background: var(--wc-ink);
+  color: var(--wc-white);
+  padding: 64px 44px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 20px 40px -22px rgba(0,0,0,0.55);
+}
+
+/* Perforations (sprocket holes) along top + bottom edges.
+   Each tooth is 26×26 with 26px gap (50% duty cycle).
+   The tooth color matches the page background so they read as
+   "biting into" the card from outside. */
+.fe-card::before,
+.fe-card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--fe-tooth-h);
+  background-color: transparent;
+  background-image: linear-gradient(
+    to right,
+    transparent     0 var(--fe-tooth-w),
+    var(--wc-white) var(--fe-tooth-w) 100%
+  );
+  background-size:
+    calc((100% - var(--fe-tooth-w)) / (var(--fe-teeth) - 1))
+    var(--fe-tooth-h);
+  background-repeat: repeat-x;
+  background-position: 0 0;
+  pointer-events: none;
+}
+.fe-card::after  { bottom: 0; }
+.fe-card::before { top: 0; }
+
+.fe-card h3 {
+  font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
+  font-weight: 500;
+  font-size: 50px;
+  line-height: 55px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--wc-white);
+}
+
+/* 5 brand-star badges in a row. Star.svg is the yellow rounded
+   square with a black asterisk inside. */
+.fe-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.fe-stars .star {
+  width: 30px;
+  height: 30px;
+  display: block;
+}
+.fe-stars .star svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fe-card p {
+  margin: 4px 0 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 23px;
+  color: rgba(255,255,255,0.92);
+  text-wrap: pretty;
+}
+
+.fe-card .author {
+  margin-top: auto;
+  padding-top: 12px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--wc-white);
+}
+
+/* ── Slider arrows (functional) ──────────────────────────────────── */
+.fe-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 64px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--wc-red);
+  color: var(--wc-white);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  transition: transform 200ms, background-color 200ms;
+  box-shadow: 0 8px 20px -8px rgba(0,0,0,0.35);
+}
+.fe-arrow:hover {
+  background-color: var(--wc-red-deep);
+}
+.fe-arrow:active { transform: translateY(-50%) scale(0.96); }
+.fe-arrow:focus-visible { outline: 2px solid var(--wc-ink); outline-offset: 3px; }
+.fe-arrow svg { width: 20px; height: 32px; display: block; }
+
+.fe-arrow-prev, .fe-arrow-next { /* positioned by JS render() */ }
+
+.fe-arrow[disabled] { opacity: 0.4; pointer-events: none; }
+
+/* Tweaks mount */
+#tweaks-root { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+#tweaks-root > * { pointer-events: auto; }
+</style>
+</head>
+<body>
+
+<section class="fe-slider" aria-label="Testimonials">
+  <div class="fe-track" id="fe-track">
+
+    <article class="fe-card">
+      <h3>Strong Drinks</h3>
+      <span class="fe-stars" aria-label="5 out of 5 stars">
+        <span class="star" id="star-tmpl"></span>
+        <span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span>
+      </span>
+      <p>Espresso martini and all the food we’ve had so far has been excellent. Atmosphere is exactly what a good neighborhood spot should feel like.</p>
+      <div class="author">- Maya L.</div>
+    </article>
+
+    <article class="fe-card">
+      <h3>Fun Experience</h3>
+      <span class="fe-stars" aria-label="5 out of 5 stars">
+        <span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span>
+      </span>
+      <p>Awesome spot to grab food and enjoy time with friends. The menu is great and the game selection is massive, there’s something for everyone. Always a fun experience every time I go.</p>
+      <div class="author">- Dom R.</div>
+    </article>
+
+    <article class="fe-card">
+      <h3>Great Service</h3>
+      <span class="fe-stars" aria-label="5 out of 5 stars">
+        <span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span>
+      </span>
+      <p>LOVE this place! I’ve been a bunch of times now with phenomenal service. Staff goes out of their way to make sure you’re having a good time.</p>
+      <div class="author">- Sohban G.</div>
+    </article>
+
+    <article class="fe-card">
+      <h3>Date Night</h3>
+      <span class="fe-stars" aria-label="5 out of 5 stars">
+        <span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span>
+      </span>
+      <p>Brought my partner here on a whim and it became our new spot. The vibe, the food, the games. Everything just works.</p>
+      <div class="author">- Alex P.</div>
+    </article>
+
+    <article class="fe-card">
+      <h3>Pure Vibes</h3>
+      <span class="fe-stars" aria-label="5 out of 5 stars">
+        <span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span>
+      </span>
+      <p>I’ve had more conversations and laughs here than anywhere else in the city. They really nailed the formula for a fun night out.</p>
+      <div class="author">- Priya N.</div>
+    </article>
+
+  </div>
+
+  <button class="fe-arrow fe-arrow-prev" id="fe-prev" type="button" aria-label="Previous testimonial">
+    <svg viewBox="3 4 18 16" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 6 L6 12 L12 18"/>
+      <path d="M19 6 L13 12 L19 18"/>
+    </svg>
+  </button>
+  <button class="fe-arrow fe-arrow-next" id="fe-next" type="button" aria-label="Next testimonial">
+    <svg viewBox="3 4 18 16" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 6 L18 12 L12 18"/>
+      <path d="M5 6 L11 12 L5 18"/>
+    </svg>
+  </button>
+</section>
+
+<!-- Inline brand star SVG, cloned into every .star slot below.
+     Asset: /assets/icons/star.svg (yellow rounded square + black asterisk). -->
+<svg id="star-template" xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="brand-star" viewBox="0 0 125 125">
+    <path d="M114.2 0H10.57C4.73235 0 0 4.73235 0 10.57V114.2C0 120.038 4.73235 124.77 10.57 124.77H114.2C120.038 124.77 124.77 120.038 124.77 114.2V10.57C124.77 4.73235 120.038 0 114.2 0Z" fill="#F5AC53"/>
+    <path d="M109.76 54.8798H80.52L101.19 34.1998L90.57 23.5798L69.9 44.2598V15.0098H54.88V44.2598L34.2 23.5798L23.58 34.1998L44.26 54.8798H15.01V69.8998H44.26L23.58 90.5698L34.2 101.19L54.88 80.5198V109.76H69.9V80.5198L90.57 101.19L101.19 90.5698L80.52 69.8998H109.76V54.8798Z" fill="#1B1A17"/>
+  </symbol>
+</svg>
+
+<script>
+  /* Slider — translateX the track based on the active index. */
+  (function() {
+    const track   = document.getElementById('fe-track');
+    const cards   = track.children;
+    const prevBtn = document.getElementById('fe-prev');
+    const nextBtn = document.getElementById('fe-next');
+    let index = Math.floor(cards.length / 2); // start with middle card centered
+
+    function render() {
+      const cardW = cards[0].offsetWidth;
+      const gap   = parseFloat(getComputedStyle(track).getPropertyValue('--fe-card-gap')) || 70;
+      const step  = cardW + gap;
+      const containerW = track.parentElement.offsetWidth;
+      const offset = containerW / 2 - cardW / 2 - index * step;
+      track.style.transform = `translateX(${offset}px)`;
+      const arrowW = prevBtn.offsetWidth;
+      const gapCenter = containerW / 2 - cardW / 2 - gap / 2;
+      prevBtn.style.left = `${gapCenter - arrowW / 2}px`;
+      prevBtn.style.right = 'auto';
+      nextBtn.style.right = `${gapCenter - arrowW / 2}px`;
+      nextBtn.style.left = 'auto';
+      prevBtn.disabled = (index <= 0);
+      nextBtn.disabled = (index >= cards.length - 1);
+    }
+    prevBtn.addEventListener('click', () => { if (index > 0)              { index--; render(); }});
+    nextBtn.addEventListener('click', () => { if (index < cards.length-1) { index++; render(); }});
+    window.addEventListener('resize', render);
+    render();
+
+    // Populate each .star with the brand-star symbol use.
+    document.querySelectorAll('.star').forEach(s => {
+      s.innerHTML = '<svg width="100%" height="100%"><use href="#brand-star"/></svg>';
+    });
+  })();
+</script>
+
+<div id="tweaks-root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="../tweaks-panel.jsx"></script>
+<script type="text/babel">
+  const FE_TWEAKS = /*EDITMODE-BEGIN*/{
+    "cardW": 540,
+    "cardGap": 70,
+    "titleSize": 50,
+    "bodySize": 16,
+    "cardPadV": 64,
+    "cardPadH": 44,
+    "cardGapInner": 18,
+    "toothW": 75,
+    "toothH": 22,
+    "teeth": 6,
+    "starSize": 30,
+    "arrowW": 36,
+    "arrowH": 64
+  }/*EDITMODE-END*/;
+
+  function FETweaks() {
+    const [t, setTweak] = useTweaks(FE_TWEAKS);
+    React.useEffect(() => {
+      const track = document.querySelector('.fe-track');
+      if (track) {
+        track.style.setProperty('--fe-card-w', `${t.cardW}px`);
+        track.style.setProperty('--fe-card-gap', `${t.cardGap}px`);
+      }
+      document.querySelectorAll('.fe-card').forEach(card => {
+        card.style.setProperty('--fe-tooth-w', `${t.toothW}px`);
+        card.style.setProperty('--fe-tooth-h', `${t.toothH}px`);
+        card.style.setProperty('--fe-teeth', t.teeth);
+        card.style.padding = `${t.cardPadV}px ${t.cardPadH}px`;
+        card.style.gap = `${t.cardGapInner}px`;
+      });
+      document.querySelectorAll('.fe-card h3').forEach(h => {
+        h.style.fontSize = `${t.titleSize}px`;
+        h.style.lineHeight = `${t.titleSize * 1.1}px`;
+      });
+      document.querySelectorAll('.fe-card p').forEach(p => {
+        p.style.fontSize = `${t.bodySize}px`;
+      });
+      document.querySelectorAll('.fe-stars .star').forEach(s => {
+        s.style.width = `${t.starSize}px`;
+        s.style.height = `${t.starSize}px`;
+      });
+      document.querySelectorAll('.fe-arrow').forEach(a => {
+        a.style.width = `${t.arrowW}px`;
+        a.style.height = `${t.arrowH}px`;
+      });
+    }, [t]);
+
+    return (
+      <TweaksPanel title="Tweaks · testimonials">
+        <TweakSection label="Cards" />
+        <TweakSlider label="Card width"  value={t.cardW}     min={360} max={720} step={4} unit="px"
+                     onChange={(v) => setTweak('cardW', v)} />
+        <TweakSlider label="Card gap"    value={t.cardGap}   min={20}  max={160} step={2} unit="px"
+                     onChange={(v) => setTweak('cardGap', v)} />
+        <TweakSlider label="Pad V"       value={t.cardPadV}  min={24}  max={100} step={2} unit="px"
+                     onChange={(v) => setTweak('cardPadV', v)} />
+        <TweakSlider label="Pad H"       value={t.cardPadH}  min={20}  max={80}  step={2} unit="px"
+                     onChange={(v) => setTweak('cardPadH', v)} />
+        <TweakSlider label="Content gap" value={t.cardGapInner} min={4} max={32} step={1} unit="px"
+                     onChange={(v) => setTweak('cardGapInner', v)} />
+
+        <TweakSection label="Typography" />
+        <TweakSlider label="Title size"  value={t.titleSize} min={28} max={72} step={1} unit="px"
+                     onChange={(v) => setTweak('titleSize', v)} />
+        <TweakSlider label="Body size"   value={t.bodySize}  min={12} max={24} step={1} unit="px"
+                     onChange={(v) => setTweak('bodySize', v)} />
+
+        <TweakSection label="Sprockets" />
+        <TweakSlider label="Tooth width" value={t.toothW}    min={20} max={80} step={2} unit="px"
+                     onChange={(v) => setTweak('toothW', v)} />
+        <TweakSlider label="Tooth depth" value={t.toothH}    min={12} max={60} step={2} unit="px"
+                     onChange={(v) => setTweak('toothH', v)} />
+        <TweakSlider label="Teeth count" value={t.teeth}     min={3}  max={12} step={1} unit=""
+                     onChange={(v) => setTweak('teeth', v)} />
+
+        <TweakSection label="Stars & Arrows" />
+        <TweakSlider label="Star size"   value={t.starSize}  min={16} max={48} step={1} unit="px"
+                     onChange={(v) => setTweak('starSize', v)} />
+        <TweakSlider label="Arrow W"     value={t.arrowW}    min={36} max={80} step={2} unit="px"
+                     onChange={(v) => setTweak('arrowW', v)} />
+        <TweakSlider label="Arrow H"     value={t.arrowH}    min={60} max={160} step={2} unit="px"
+                     onChange={(v) => setTweak('arrowH', v)} />
+      </TweaksPanel>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('tweaks-root')).render(<FETweaks />);
+</script>
+</body></html>

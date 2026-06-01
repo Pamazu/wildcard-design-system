@@ -1,0 +1,109 @@
+/* Connected.module.css — extracted from preview/pages-home.css (stay connected).
+ *
+ * Wrapped in :global so class names stay un-mangled.
+ */
+
+/* =====================================================================
+   8. STAY CONNECTED
+   ===================================================================== */
+/* Stay Connected — LIGHT section over the body's cream paper-grain
+   bg (transparent). Single `.connected-stars` row above the heading;
+   sub-text + social row + RED @VISITWILDCARD pill; below: the
+   canonical `.photo-strip.photo-strip--yellow` (YELLOW wrap, 6
+   square 1:1 photos). Ported from HTML pages-home.html:840-915 with
+   the photo-strip yellow + pill red color flips per Figma. */
+.connected {
+  background: transparent;
+  color: var(--wc-ink);
+  text-align: center;
+  padding: 80px 32px;
+}
+.connected-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.connected-stars {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin: 0 0 20px;
+}
+.connected-stars svg { width: 36px; height: 36px; }
+.connected h2 {
+  font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
+  font-weight: 500;
+  font-size: clamp(42px, 5vw, 60px);
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  line-height: 1.05;
+  color: var(--wc-ink);
+}
+.connected .connected-sub {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--fg-2);
+  margin: 0 0 24px;
+}
+.social-row {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin-bottom: 24px;
+}
+.social-row a {
+  width: 44px; height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wc-ink);
+  text-decoration: none;
+  transition: opacity var(--dur-2);
+}
+.social-row a:hover { opacity: 0.7; }
+.social-row a svg { width: 28px; height: 28px; }
+.social-tag {
+  /* RED @VISITWILDCARD pill with cream text per Figma */
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 26px;
+  background: var(--wc-red);
+  color: var(--wc-white);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  margin-bottom: 40px;
+  box-shadow: 0 1px 0 rgba(27,26,23,0.04);
+  transition: transform var(--dur-2) var(--ease-out), background-color var(--dur-2) var(--ease-out);
+}
+.social-tag:hover {
+  background: var(--wc-red-deep);
+  transform: translateY(-2px);
+}
+/* Canonical Photo Frame Treatment — RED (default) and YELLOW variants.
+   Edge-to-edge wrap, 22px padding, 12px gaps, square 1:1 photos.
+   Ported 1:1 from wildcard-design-system/preview/photo-frames.html:361-385. */
+.photo-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 12px;
+  background: var(--wc-red);
+  padding: 22px;
+}
+.photo-strip--yellow { background: var(--wc-yellow); }
+.photo-strip .photo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 0;
+  background-position: center;
+  background-size: cover;
+  background-color: rgba(0,0,0,0.18);
+}
+

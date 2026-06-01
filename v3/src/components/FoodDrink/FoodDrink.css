@@ -1,0 +1,25 @@
+/* FoodDrink — component-specific CSS.
+ *
+ * The PRIMARY layout for .hero-fd lives in src/styles/pages-home.css (it's
+ * positioned with margin-top:-514px to overlap into Hero, width:100vw, etc.).
+ * This file only carries v2-specific tweaks that aren't in the shared
+ * page-level CSS — chiefly the mobile breakpoints, which match HTML's
+ * `@media (max-width: 480px)` block in pages-home.css. */
+
+/* ── Mobile (≤480px) ─────────────────────────────────────────────────
+   Shrinks badge + card padding so the title row + asterisk badges
+   actually fit at 320px viewport. Mirrors the HTML version's
+   `.hero-fd` mobile rules. */
+@media (max-width: 480px) {
+  .hero-fd .card { width: 300px; max-width: calc(100vw - 24px); }
+  .hero-fd .card .inner { padding: 36px 24px; gap: 8px; }
+  .hero-fd .card h2 { font-size: 32px; line-height: 1.05; }
+  .hero-fd .card p { font-size: 13px; max-width: 220px; }
+  .hero-fd .fd-title-row { gap: 12px; }
+  .hero-fd .fd-title-row .badge { width: 40px; height: 40px; }
+  .hero-fd .fd-title-row .badge svg { width: 22px; height: 22px; }
+}
+
+/* Tweaks mount */
+#tweaks-root { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+#tweaks-root > * { pointer-events: auto; }

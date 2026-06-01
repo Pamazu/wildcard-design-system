@@ -1,0 +1,264 @@
+/* Hero.module.css — extracted from components-canonical.css (hero section).
+ *
+ * Wrapped in :global so class names stay un-mangled — JSX inherits its
+ * v1 className strings unchanged. New rules added outside :global gain
+ * scoped (hashed) class names.
+ */
+
+/* ============================================================
+   FROM components-hero.html
+   ============================================================ */
+
+/* =========================================================================
+   HERO — Wildcard
+
+   Two-column hero on the shared `.wc-bgline` background.
+
+   Container model
+   ---------------
+   .hero-inner is a centered, max-width 1280px container. Inside it:
+     · .hero-copy = LEFT column (copy + CTAs + info lines), width-capped
+     · .hero-cluster = anchored absolutely. Its LEFT edge sits at the right
+       edge of .hero-copy. Its RIGHT edge can overflow past the container's
+       right edge — bleeding outward, NOT into the viewport edge. That's
+       why the cluster is positioned by `left:` measured from the container
+       and given its own explicit width; we don't let it stretch to the
+       container's right edge.
+
+   Icon stair pattern
+   ------------------
+   4 columns × 2 tiles each = 8 brand-icon tiles. ALL tiles identical size.
+   Y position per column (in units of step):
+     col1 = 0 (lowest)   col2 = -1   col3 = -2 (highest)   col4 = 0 (restart)
+   This produces the user's "1 lower, 2 higher, 3 even higher, then restart"
+   stair pattern, repeated across the cluster.
+
+   Decorative type
+   ---------------
+   Only the FIRST WORD of each line is decorative: DRINK / PLAY get the
+   color-cycle + up/down bounce. BOLDLY / WILD stay plain white.
+
+   Food & Drink band
+   -----------------
+   Photo strip uses width:100vw breakout so it actually bleeds edge-to-edge
+   of the VIEWPORT. The scalloped FOOD & DRINK card floats above the strip
+   and straddles the yellow wave from the hero above. Spacing between hero
+   copy and the card is preserved — no overlap.
+   ========================================================================= */
+/* ── HERO SECTION ─────────────────────────────────────────────────── */
+/* .hero / .hero-inner / .hero-copy / .hero h1 / .line / .plain — static styling
+   now lives on the JSX as Tailwind utilities (#36 rollout component 2/6); rules
+   removed so the utilities own the cascade. Class hooks kept (Dashboard targets +
+   descendant selectors below). `relative` anchor for the absolute cluster is now
+   the `relative` utility on .hero-inner. Responsive moved to max-[1181px]:/
+   max-[881px]: utilities on the elements. */
+
+.hero h1 .deco {
+  display: inline-flex;
+  gap: 0.015em;
+  vertical-align: baseline;
+}
+.hero h1 .deco span {
+  display: inline-block;
+  line-height: 1;
+}
+.hero h1 .deco span:nth-child(odd)  { transform: translateY(-6px); }
+.hero h1 .deco span:nth-child(even) { transform: translateY( 4px); }
+.hero h1 .deco span:nth-child(5n+1) { color: var(--wc-yellow); }
+.hero h1 .deco span:nth-child(5n+2) { color: var(--wc-blue);   }
+.hero h1 .deco span:nth-child(5n+3) { color: var(--wc-red);    }
+.hero h1 .deco span:nth-child(5n+4) { color: var(--wc-purple); }
+.hero h1 .deco span:nth-child(5n+5) { color: var(--wc-green);  }
+
+/* .hero .lede — type now utilities on JSX ([font-family:var(--font-body)]
+   font-medium text-[19px] leading-[1.45] text-[rgba(249,240,237,0.92)]).
+   `lede` class kept as a no-op hook. */
+
+/* .hero-ctas layout → `flex flex-wrap gap-3.5 mb-8` on JSX (v3) */
+/* btn-sm styling from shared btn.css — no local overrides */
+
+/* .hero-info layout → `flex flex-col gap-2 list-none m-0 p-0` on JSX (v3) */
+/* .hero-info li — type now utilities on JSX (text-[#f9f0ed]
+   [font-family:var(--font-body)] font-medium text-[15px] leading-[1.4]).
+   .hero-info svg.bullet — size now utilities (w-[22px] h-[22px] flex-none block). */
+
+/* ── ICON CLUSTER (absolute, overflows past container right) ─────── *
+ * Anchored to .hero-inner. left = copy width + gap. Width is fixed,  *
+ * and the cluster extends visually past the container's right edge   *
+ * by however much (cluster.width + cluster.left) exceeds container.  *
+ * The 4-col × 2-tile stair pattern is realized via CSS Grid where    *
+ * each column's tiles are placed via grid-row offsets.                */
+.hero-cluster {
+  --tile: var(--hero-tile, 96px);
+  --gap:  var(--hero-tile-gap, 10px);
+  --step: calc(var(--tile) * 0.5);
+  position: absolute;
+  top: var(--hero-cluster-top, 0px);
+  left: calc(var(--hero-copy-w, 720px) + var(--hero-cluster-gap, 48px));
+  width: calc(4 * var(--tile) + 3 * var(--gap));
+  height: calc(2 * var(--tile) + var(--gap) + 2 * var(--step));
+  pointer-events: none;
+  /* Uniform scale of the entire cluster — fine-tune overall size without
+     touching individual tile/gap values. */
+  transform: scale(var(--hero-cluster-scale, 1));
+  transform-origin: top left;
+}
+.hero-cluster .tile {
+  position: absolute;
+  width: var(--tile);
+  height: var(--tile);
+  display: block;
+}
+.hero-cluster .tile svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* Column X position helper:
+   colN_left = (N-1) * (tile + gap)
+   Column Y offset helper (top of column):
+   col1 = 2*step (lowest)
+   col2 = 1*step
+   col3 = 0       (highest)
+   col4 = 2*step  (restart pattern)
+   Each column has 2 tiles: top tile at colY, bottom tile at colY + tile + gap.
+*/
+.hero-cluster .c1-top    { left: calc(0 * (var(--tile) + var(--gap)));
+                           top:  calc(2 * var(--step)); }
+.hero-cluster .c1-bottom { left: calc(0 * (var(--tile) + var(--gap)));
+                           top:  calc(2 * var(--step) + var(--tile) + var(--gap)); }
+
+.hero-cluster .c2-top    { left: calc(1 * (var(--tile) + var(--gap)));
+                           top:  calc(1 * var(--step)); }
+.hero-cluster .c2-bottom { left: calc(1 * (var(--tile) + var(--gap)));
+                           top:  calc(1 * var(--step) + var(--tile) + var(--gap)); }
+
+.hero-cluster .c3-top    { left: calc(2 * (var(--tile) + var(--gap)));
+                           top:  0; }
+.hero-cluster .c3-bottom { left: calc(2 * (var(--tile) + var(--gap)));
+                           top:  calc(var(--tile) + var(--gap)); }
+
+.hero-cluster .c4-top    { left: calc(3 * (var(--tile) + var(--gap)));
+                           top:  calc(2 * var(--step)); }
+.hero-cluster .c4-bottom { left: calc(3 * (var(--tile) + var(--gap)));
+                           top:  calc(2 * var(--step) + var(--tile) + var(--gap)); }
+
+/* ── FOOD & DRINK band ────────────────────────────────────────────── *
+ * Sits BELOW the hero copy, separated by guaranteed margin. The card  *
+ * floats over a photo strip that bleeds edge-to-edge of the VIEWPORT  *
+ * (width:100vw breakout). The card pulls UP into the hero's wave by   *
+ * --fd-overlap so it straddles the yellow stroke, but never overlaps  *
+ * the hero copy because the copy column already cleared above it.      */
+.hero-fd {
+  position: relative;
+  width: 100vw;                     /* viewport-wide breakout            */
+  margin-left: 50%;
+  transform: translateX(-50%);
+  /* margin-top intentionally NOT set here — the negative overlap that pulls
+     the card up over the hero wave is HOMEPAGE COMPOSITION, not intrinsic
+     to the F&D component. Composition rules live behind `.wc-home .hero-fd`
+     in src/styles/pages-home.css (desktop -514px, tablet -440px, mobile
+     -380px). Standalone `?component=FoodDrink` routes render with no pull
+     so the component sits in its natural flow. Per #79 refactor. */
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-fd .photos {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  background: var(--wc-red);
+  padding: 10px;
+  width: 100%;            /* edge to edge of viewport */
+}
+.hero-fd .photos .photo {
+  aspect-ratio: 1 / 1;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: rgba(0,0,0,0.18);
+}
+
+.hero-fd .card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--hero-fd-card-w, 540px);
+  max-width: calc(100vw - 64px);
+  z-index: 2;
+}
+.hero-fd .card .scallop { display: block; width: 100%; height: auto; }
+.hero-fd .card .inner {
+  position: absolute;
+  inset: 0;
+  padding: 64px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+}
+.hero-fd .fd-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+}
+.hero-fd .fd-title-row svg {
+  width: 44px; height: 44px;
+  display: block;
+  flex: none;
+}
+.hero-fd .card h2 {
+  font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
+  font-weight: 500;
+  font-size: 48px;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--wc-ink);
+  margin: 0;
+}
+.hero-fd .card p {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--wc-ink);
+  margin: 0;
+  max-width: 360px;
+  text-wrap: pretty;
+}
+/* FD card button — uses shared .btn-sm .btn-red */
+.hero-fd .card .btn { margin-top: 6px; }
+
+/* ── Responsive ───────────────────────────────────────────────────── */
+/* Responsive: .hero padding/min-h, .hero-copy max-width, .hero h1 font-size are
+   max-[1181px]:/max-[861px]: utilities on the JSX (+1 inclusive = v1's
+   max-width:1180/860 — v1's hero breakpoint is 860, NOT 880). The ≤860 cluster
+   in-flow flip lives in pages-home.css @860 (winning layer). Only the @1180
+   cluster --tile + residual F&D card sizing stay here. */
+@media (max-width: 1180px) {
+  .hero-cluster { --tile: 80px; left: calc(60% + 24px); }
+}
+@media (max-width: 880px) {
+  /* .hero-cluster ≤860 in-flow flip (position:relative, top/left/right auto,
+     margin-top 32, width 100%, tile 64, transform none) now lives in
+     pages-home.css @860 — the winning layer (it loads after this file, so a
+     rule here loses). Removed from here so it also stops firing EARLY at
+     861-880 with --tile:64 (v1 keeps tile 80 until 860). F&D rules below kept. */
+  .hero-fd .photos { grid-template-columns: repeat(6, 1fr); }
+  .hero-fd .card { width: min(540px, calc(100vw - 48px)); }
+  .hero-fd .card .inner { padding: 48px 32px; }
+  .hero-fd .card h2 { font-size: 36px; }
+}
+
+/* Tweaks mount */
+#tweaks-root { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+#tweaks-root > * { pointer-events: auto; }
+

@@ -1,0 +1,936 @@
+/* Dashboard.css — v2 component browser chrome.
+ * Feature-parity with HTML dashboard at localhost:8080.
+ * Self-contained; doesn't pollute the homepage. */
+
+:root {
+  --wcds-sidebar-w: 300px;
+  --wcds-topbar-h: 52px;
+  --wcds-ink: #1b1a17;
+  --wcds-cream: #f9f0ed;
+  --wcds-cream-dim: #b8aea8;
+  --wcds-yellow: #f5ac53;
+  --wcds-yellow-hover: #f7bf76;
+  --wcds-red: #ed5a35;
+  --wcds-green: #199562;
+}
+
+.wc-dash-shell {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  background: var(--wcds-ink);
+  color: var(--wcds-cream);
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+  z-index: 1000;
+}
+
+/* ────────── TOPBAR ────────── */
+.wc-dash-topbar {
+  flex: 0 0 auto;
+  height: var(--wcds-topbar-h);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 10px;
+  border-bottom: 1px solid rgba(249, 240, 237, 0.12);
+  background: rgba(0, 0, 0, 0.2);
+}
+.wc-dash-brand {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--wcds-yellow);
+}
+.wc-dash-sep {
+  width: 1px; height: 22px;
+  background: rgba(249, 240, 237, 0.18);
+}
+.wc-dash-current {
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--wcds-cream-dim);
+  white-space: nowrap;
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* mode toggle */
+.wc-dash-mode-toggle {
+  display: inline-flex;
+  border: 1px solid rgba(249,240,237,0.2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.wc-dash-mode {
+  appearance: none; background: transparent; border: none;
+  color: var(--wcds-cream-dim);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 6px 12px; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.wc-dash-mode:hover { color: var(--wcds-cream); }
+.wc-dash-mode.is-active { background: var(--wcds-yellow); color: var(--wcds-ink); }
+
+.wc-dash-tb-btn {
+  appearance: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(249,240,237,0.06);
+  border: 1px solid rgba(249,240,237,0.12);
+  border-radius: 6px;
+  color: var(--wcds-cream);
+  font: inherit; font-size: 12px; font-weight: 500;
+  padding: 6px 10px; cursor: pointer;
+  transition: background 0.15s;
+}
+.wc-dash-tb-btn:hover:not(:disabled) { background: rgba(249,240,237,0.12); }
+.wc-dash-tb-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.wc-dash-approval-group {
+  display: inline-flex; gap: 6px;
+  padding: 0 6px;
+  border-left: 1px solid rgba(249,240,237,0.12);
+  border-right: 1px solid rgba(249,240,237,0.12);
+}
+.wc-dash-looks-good:not(:disabled) { background: rgba(25,149,98,0.18); border-color: rgba(25,149,98,0.4); color: #6cd9a5; }
+.wc-dash-looks-good:hover:not(:disabled) { background: rgba(25,149,98,0.28); }
+.wc-dash-needs-work:not(:disabled) { background: rgba(237,90,53,0.18); border-color: rgba(237,90,53,0.4); color: #f4a08a; }
+.wc-dash-needs-work:hover:not(:disabled) { background: rgba(237,90,53,0.28); }
+
+.wc-dash-tweaks-btn:not(:disabled) { background: rgba(245,172,83,0.18); border-color: rgba(245,172,83,0.4); color: var(--wcds-yellow-hover); }
+
+/* ────────── BODY (sidebar + main) ────────── */
+/* position:relative makes this the containing block for the absolute
+   tweaks panel (which overlays main rather than pushing it sideways). */
+.wc-dash-body { flex: 1 1 auto; display: flex; overflow: hidden; position: relative; }
+
+/* ────────── SIDEBAR ────────── */
+.wc-dash-sidebar {
+  flex: 0 0 var(--wcds-sidebar-w);
+  background: rgba(0,0,0,0.25);
+  border-right: 1px solid rgba(249,240,237,0.08);
+  overflow-y: auto;
+  padding: 0 0 32px;
+}
+.wc-dash-sidebar::-webkit-scrollbar { width: 6px; }
+.wc-dash-sidebar::-webkit-scrollbar-track { background: transparent; }
+.wc-dash-sidebar::-webkit-scrollbar-thumb { background: rgba(249,240,237,0.18); border-radius: 3px; }
+
+.wc-dash-approved-counter {
+  position: sticky; top: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  padding: 16px 24px 12px;
+  border-bottom: 1px solid rgba(249,240,237,0.08);
+  display: flex; flex-direction: column;
+  z-index: 1;
+}
+.wc-dash-approved-n { font-size: 18px; font-weight: 700; color: var(--wcds-yellow); }
+.wc-dash-approved-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--wcds-cream-dim); }
+
+.wc-dash-cat { margin-top: 16px; }
+.wc-dash-cat-title {
+  margin: 0 0 4px;
+  padding: 12px 24px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wcds-cream-dim);
+}
+
+.wc-dash-subcat { margin-bottom: 4px; }
+.wc-dash-subcat-title {
+  margin: 0;
+  padding: 4px 24px;
+  font-size: 11px; font-weight: 600;
+  color: rgba(249, 240, 237, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wc-dash-list { list-style: none; margin: 0; padding: 0; }
+
+.wc-dash-item {
+  appearance: none;
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: transparent; border: none;
+  color: var(--wcds-cream);
+  font: inherit; font-size: 12.5px;
+  padding: 7px 24px 7px 32px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.wc-dash-item:hover { background: rgba(245, 172, 83, 0.08); }
+.wc-dash-item.is-active {
+  background: rgba(245, 172, 83, 0.16);
+  color: var(--wcds-yellow);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--wcds-yellow);
+}
+
+.wc-dash-status-dot {
+  flex: 0 0 auto;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(249, 240, 237, 0.3);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.wc-dash-status-dot:hover { transform: scale(1.4); box-shadow: 0 0 0 3px rgba(249,240,237,0.1); }
+.wc-dash-status-new        { background: rgba(249, 240, 237, 0.3); }
+.wc-dash-status-looks-good { background: var(--wcds-green); }
+.wc-dash-status-needs-work { background: var(--wcds-red); }
+
+.wc-dash-item-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.wc-dash-v2-badge {
+  flex: 0 0 auto;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: rgba(245,172,83,0.2);
+  color: var(--wcds-yellow);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ────────── MAIN / IFRAME ────────── */
+.wc-dash-main {
+  flex: 1 1 auto;
+  background: var(--wcds-cream);
+  overflow: hidden;
+  display: flex;
+}
+.wc-dash-iframe {
+  flex: 1;
+  width: 100%; height: 100%;
+  border: none;
+  display: block;
+  background: transparent;
+}
+
+/* ────────── TWEAKS PANEL ────────── */
+.wc-dash-tweak-badge {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 5px;
+  background: rgba(245,172,83,0.4);
+  color: var(--wcds-yellow);
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 8px;
+}
+.wc-dash-tweaks-btn.is-active {
+  background: var(--wcds-yellow);
+  color: var(--wcds-ink);
+  border-color: var(--wcds-yellow);
+}
+.wc-dash-tweaks-btn.is-active .wc-dash-tweak-badge {
+  background: rgba(27, 26, 23, 0.2);
+  color: var(--wcds-ink);
+}
+
+.wc-dash-tweaks-panel {
+  /* OVERLAY pattern, not push pattern: previously this was a flex sibling
+     of .wc-dash-main, so opening the panel SHRANK the iframe viewport by
+     320px → cross-fired the responsive media-query at 1180px breakpoint
+     (iframe dropped from 1140 → 820, triggering .hero padding shrink from
+     170/296 → 80/80). The "bug" looked like the panel was changing the
+     hero's CSS. Fix: position absolute over .wc-dash-main so the iframe
+     viewport stays constant when the panel opens. #74. */
+  position: absolute;
+  top: 56px;        /* slot below topbar */
+  right: 0; bottom: 0;
+  width: 320px;
+  z-index: 8;
+  background: rgba(20, 16, 12, 0.96);  /* near-opaque to occlude iframe */
+  backdrop-filter: blur(2px);
+  border-left: 1px solid rgba(249,240,237,0.12);
+  box-shadow: -8px 0 24px rgba(0,0,0,0.40);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+  color: var(--wcds-cream);
+}
+.wc-dash-tweaks-header {
+  position: sticky; top: 0;
+  display: flex; align-items: center;
+  padding: 14px 16px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(249,240,237,0.1);
+  gap: 12px;
+}
+.wc-dash-tweaks-title {
+  flex: 1;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--wcds-yellow);
+}
+.wc-dash-tweaks-actions { display: flex; gap: 6px; align-items: center; }
+.wc-dash-tweaks-action {
+  appearance: none; background: rgba(249,240,237,0.08);
+  border: 1px solid rgba(249,240,237,0.16);
+  border-radius: 5px;
+  color: var(--wcds-cream);
+  font: inherit; font-size: 10px;
+  padding: 4px 10px;
+  cursor: pointer; transition: background 0.15s;
+}
+.wc-dash-tweaks-action:hover { background: rgba(249,240,237,0.16); }
+.wc-dash-tweaks-close {
+  appearance: none; background: transparent;
+  border: none; color: var(--wcds-cream-dim);
+  font-size: 22px; line-height: 1;
+  cursor: pointer; padding: 0 4px;
+}
+.wc-dash-tweaks-close:hover { color: var(--wcds-cream); }
+
+.wc-dash-tweaks-note {
+  margin: 0; padding: 10px 16px;
+  background: rgba(245, 172, 83, 0.12);
+  border-bottom: 1px solid rgba(245, 172, 83, 0.2);
+  font-size: 11px; color: var(--wcds-yellow-hover);
+}
+.wc-dash-tweaks-empty {
+  margin: 0; padding: 32px 16px;
+  text-align: center; font-size: 12px;
+  color: var(--wcds-cream-dim);
+}
+
+.wc-dash-tweaks-list { list-style: none; margin: 0; padding: 12px 0; }
+.wc-dash-tweak-row {
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(249,240,237,0.05);
+}
+.wc-dash-tweak-label {
+  display: flex; align-items: baseline; justify-content: space-between;
+  font-size: 11px; font-weight: 500;
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.wc-dash-tweak-label > span:first-child { color: var(--wcds-cream); }
+.wc-dash-tweak-value {
+  font-size: 10px; font-weight: 600;
+  font-family: ui-monospace, monospace;
+  color: var(--wcds-yellow);
+  letter-spacing: 0;
+}
+
+.wc-dash-tweak-slider {
+  width: 100%;
+  appearance: none;
+  height: 4px;
+  background: rgba(249,240,237,0.15);
+  border-radius: 2px;
+  outline: none;
+}
+.wc-dash-tweak-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px; height: 14px;
+  background: var(--wcds-yellow);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid rgba(0,0,0,0.4);
+}
+.wc-dash-tweak-slider::-moz-range-thumb {
+  width: 14px; height: 14px;
+  background: var(--wcds-yellow);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid rgba(0,0,0,0.4);
+}
+
+.wc-dash-tweak-segmented {
+  display: flex;
+  border: 1px solid rgba(249,240,237,0.16);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.wc-dash-tweak-seg {
+  flex: 1;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-right: 1px solid rgba(249,240,237,0.16);
+  color: var(--wcds-cream-dim);
+  font: inherit; font-size: 10px;
+  padding: 6px 4px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.wc-dash-tweak-seg:last-child { border-right: none; }
+.wc-dash-tweak-seg:hover { background: rgba(249,240,237,0.06); color: var(--wcds-cream); }
+.wc-dash-tweak-seg.is-active {
+  background: var(--wcds-yellow);
+  color: var(--wcds-ink);
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Comment mode — overlay + annotation cards
+ * Layered on top of the iframe inside .wc-dash-main. Inactive = pointer-
+ * events:none so the iframe stays interactive. Active = pointer-events:auto
+ * with a crosshair cursor; the user drags rectangles to drop annotations.
+ * Coords are %-of-overlay so cards stay anchored across iframe resize.
+ * ───────────────────────────────────────────────────────────────────────── */
+.wc-dash-main { position: relative; }
+.wc-dash-comment-overlay {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.wc-dash-comment-overlay.is-active {
+  pointer-events: auto;
+  cursor: crosshair;
+  background: rgba(31,15,11,0.08);
+  /* subtle red ring confirms commentMode is engaged */
+  box-shadow: inset 0 0 0 2px rgba(216,68,33,0.55);
+}
+.wc-dash-comment-btn.is-active {
+  background: var(--wcds-red);
+  color: var(--wcds-cream);
+}
+.wc-dash-comment-hint {
+  position: absolute;
+  top: 12px; left: 50%; transform: translateX(-50%);
+  background: rgba(31,15,11,0.92);
+  color: var(--wcds-cream);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font: inherit; font-size: 11px;
+  pointer-events: none;
+  letter-spacing: 0.04em;
+}
+.wc-dash-comment-dragrect {
+  position: absolute;
+  background: rgba(216,68,33,0.18);
+  border: 1.5px dashed var(--wcds-red);
+  pointer-events: none;
+}
+.wc-dash-comment-card {
+  position: absolute;
+  min-width: 18px; min-height: 18px;
+  background: rgba(216,68,33,0.12);
+  border: 1.5px solid var(--wcds-red);
+  border-radius: 3px;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: background 0.12s, box-shadow 0.12s;
+}
+.wc-dash-comment-card:hover {
+  background: rgba(216,68,33,0.22);
+  box-shadow: 0 4px 16px rgba(216,68,33,0.30);
+}
+.wc-dash-comment-card.is-editing {
+  background: rgba(216,68,33,0.10);
+  box-shadow: 0 6px 24px rgba(31,15,11,0.40);
+  cursor: default;
+}
+.wc-dash-comment-pin {
+  position: absolute;
+  top: -10px; left: -10px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--wcds-red);
+  color: var(--wcds-cream);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(31,15,11,0.45);
+}
+.wc-dash-comment-bubble {
+  position: absolute;
+  top: 100%; left: 0;
+  margin-top: 6px;
+  width: 280px;
+  background: var(--wcds-cream);
+  color: var(--wcds-ink);
+  border: 1px solid rgba(31,15,11,0.18);
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(31,15,11,0.30);
+  padding: 8px;
+  z-index: 10;
+}
+.wc-dash-comment-bubble textarea {
+  width: 100%;
+  min-height: 70px;
+  border: 1px solid rgba(31,15,11,0.18);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 12px;
+  resize: vertical;
+  background: #fff;
+  color: var(--wcds-ink);
+  box-sizing: border-box;
+}
+.wc-dash-comment-bubble textarea:focus { outline: 2px solid var(--wcds-red); outline-offset: -2px; }
+.wc-dash-comment-actions {
+  display: flex; justify-content: flex-end; gap: 6px;
+  margin-top: 6px;
+}
+.wc-dash-comment-actions button {
+  font: inherit; font-size: 11px;
+  border: 1px solid rgba(31,15,11,0.18);
+  background: #fff;
+  color: var(--wcds-ink);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.wc-dash-comment-actions button:hover { background: rgba(31,15,11,0.06); }
+.wc-dash-comment-del  { color: var(--wcds-red) !important; border-color: var(--wcds-red) !important; }
+.wc-dash-comment-save { background: var(--wcds-ink) !important; color: var(--wcds-cream) !important; border-color: var(--wcds-ink) !important; }
+.wc-dash-comment-preview {
+  position: absolute;
+  left: calc(100% + 6px); top: 0;
+  max-width: 220px;
+  background: var(--wcds-ink);
+  color: var(--wcds-cream);
+  font: inherit; font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s;
+}
+.wc-dash-comment-card:hover .wc-dash-comment-preview { opacity: 1; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Edit mode — hover/select overlays + right-side property panel
+ * Overlays rendered inside .wc-dash-main (which positions the iframe at 0,0).
+ * Rect coords come from iframe.contentDocument.elementFromPoint(...)
+ * .getBoundingClientRect() — already in iframe-local coords matching the
+ * overlay container.
+ * ───────────────────────────────────────────────────────────────────────── */
+.wc-dash-edit-btn.is-active {
+  background: var(--wcds-yellow);
+  color: var(--wcds-ink);
+}
+.wc-dash-edit-hover, .wc-dash-edit-sel {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+  box-sizing: border-box;
+}
+.wc-dash-edit-hover {
+  border: 2px dashed var(--wcds-yellow);
+  background: rgba(255,193,7,0.18);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.50);
+}
+.wc-dash-edit-sel {
+  border: 3px solid var(--wcds-red);
+  background: rgba(216,68,33,0.18);
+  box-shadow: 0 0 0 1px rgba(31,15,11,0.85), 0 0 0 4px rgba(216,68,33,0.30);
+}
+.wc-dash-edit-tooltip {
+  position: absolute;
+  top: -24px; left: 0;
+  background: var(--wcds-ink);
+  color: var(--wcds-cream);
+  font: inherit; font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 3px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.wc-dash-edit-panel {
+  position: absolute;
+  top: 56px; right: 0; bottom: 0;
+  /* 280 → 320: gives the Box section's 2-up T/R/B/L grid comfortable room for
+     3-4 digit values (and negatives like -514). Paired with the minmax(0,1fr)
+     grid fix below — together they clear the caller's horizontal scroll. */
+  width: 320px;
+  background: var(--wcds-ink);
+  color: var(--wcds-cream);
+  border-left: 1px solid rgba(249,240,237,0.16);
+  overflow-y: auto;
+  z-index: 10;
+  font: inherit; font-size: 11px;
+  padding: 0 0 16px;
+}
+.wc-dash-edit-panel-header {
+  position: sticky; top: 0;
+  display: flex; align-items: center;
+  padding: 10px 12px;
+  background: var(--wcds-ink);
+  border-bottom: 1px solid rgba(249,240,237,0.16);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  z-index: 1;
+}
+.wc-dash-edit-panel-tag {
+  background: var(--wcds-red);
+  color: var(--wcds-cream);
+  padding: 3px 7px;
+  border-radius: 3px;
+  font-size: 10px;
+}
+/* R2 — breadcrumb: ancestor trail (climb up) + child chips (drill down) */
+.wc-dash-edit-crumbs { padding: 6px 12px 8px; border-bottom: 1px solid rgba(249,240,237,0.08); display: flex; flex-direction: column; gap: 5px; }
+.wc-dash-crumb-trail, .wc-dash-crumb-kids { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; }
+.wc-dash-crumb-wrap { display: inline-flex; align-items: center; gap: 3px; }
+.wc-dash-crumb-sep { color: var(--wcds-cream-dim); font-size: 10px; }
+.wc-dash-crumb { font: inherit; font-size: 10px; font-family: ui-monospace, monospace; padding: 2px 6px; border: 1px solid transparent; background: transparent; color: var(--wcds-cream-dim); border-radius: 4px; cursor: pointer; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wc-dash-crumb:hover { color: var(--wcds-cream); background: rgba(249,240,237,0.06); }
+.wc-dash-crumb.is-current { color: var(--wcds-ink, #1b1a17); background: var(--wcds-yellow, #f5ac53); border-color: var(--wcds-yellow,#f5ac53); cursor: default; }
+.wc-dash-crumb-kids-label { font-size: 9px; color: var(--wcds-cream-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.wc-dash-crumb-kid { font: inherit; font-size: 10px; font-family: ui-monospace, monospace; padding: 2px 6px; border: 1px dashed rgba(249,240,237,0.2); background: transparent; color: var(--wcds-cream-dim); border-radius: 4px; cursor: pointer; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wc-dash-crumb-kid:hover { color: var(--wcds-cream); border-color: rgba(249,240,237,0.4); background: rgba(249,240,237,0.06); }
+.wc-dash-edit-panel-close {
+  background: transparent; border: none; color: var(--wcds-cream-dim);
+  font: inherit; font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.wc-dash-edit-panel-close:hover { color: var(--wcds-cream); }
+
+.wc-dash-edit-section { padding: 8px 12px; border-bottom: 1px solid rgba(249,240,237,0.08); }
+.wc-dash-edit-section-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--wcds-cream-dim);
+  margin-bottom: 6px;
+}
+.wc-dash-edit-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 0;
+  min-height: 24px;
+}
+.wc-dash-edit-row-sides { align-items: flex-start; }
+.wc-dash-edit-row-label {
+  flex: 0 0 70px;
+  font-size: 10px;
+  color: var(--wcds-cream-dim);
+}
+.wc-dash-edit-row-input {
+  flex: 1;
+  background: rgba(249,240,237,0.06);
+  border: 1px solid rgba(249,240,237,0.16);
+  color: var(--wcds-cream);
+  font: inherit; font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.wc-dash-edit-row-input:focus { outline: 1px solid var(--wcds-yellow); }
+.wc-dash-edit-row-input:disabled { opacity: 0.5; }
+.wc-dash-edit-row-select {
+  flex: 1;
+  background: rgba(249,240,237,0.06);
+  border: 1px solid rgba(249,240,237,0.16);
+  color: var(--wcds-cream);
+  font: inherit; font-size: 11px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  min-width: 0;
+}
+.wc-dash-edit-dim-unit { flex: 0 0 56px; }
+.wc-dash-edit-row-unit { font-size: 10px; color: var(--wcds-cream-dim); flex: 0 0 14px; }
+.wc-dash-edit-row-color { width: 28px; height: 22px; padding: 0; border: 1px solid rgba(249,240,237,0.16); border-radius: 3px; background: transparent; }
+.wc-dash-edit-row-hex { font-size: 10px; color: var(--wcds-cream-dim); font-family: monospace; }
+
+.wc-dash-edit-segmented {
+  display: inline-flex;
+  border: 1px solid rgba(249,240,237,0.16);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.wc-dash-edit-seg-btn {
+  background: transparent;
+  border: none;
+  border-right: 1px solid rgba(249,240,237,0.16);
+  color: var(--wcds-cream-dim);
+  font: inherit; font-size: 10px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.wc-dash-edit-seg-btn:last-child { border-right: none; }
+.wc-dash-edit-seg-btn.is-active {
+  background: var(--wcds-yellow);
+  color: var(--wcds-ink);
+  font-weight: 600;
+}
+.wc-dash-edit-sides-grid {
+  display: grid;
+  /* minmax(0,1fr) — NOT plain 1fr. Plain 1fr resolves to minmax(auto,1fr),
+     whose `auto` floor = the number inputs' intrinsic min-width (~152px each),
+     so the 2-up grid forced 304px and overflowed the panel → the caller's
+     horizontal scroll. minmax(0,1fr) lets each track shrink to fit the panel.
+     min-width:0 lets the grid itself (a flex:1 child of the row) shrink too. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+.wc-dash-edit-sides-field {
+  display: flex; align-items: center; gap: 3px;
+  /* allow the field (a grid-track child) to shrink below its content min */
+  min-width: 0;
+}
+.wc-dash-edit-sides-label {
+  font-size: 10px;
+  color: var(--wcds-cream-dim);
+  flex: 0 0 12px;
+}
+.wc-dash-edit-sides-field .wc-dash-edit-row-input { flex: 1; min-width: 0; padding: 2px 4px; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Inspect & Replace — purple theme matches HTML dashboard convention
+ * Overlay rects snap to semantic ancestors (section/nav/footer/etc.) for
+ * section-level replacement. Modal dialog with component picker.
+ * ───────────────────────────────────────────────────────────────────────── */
+.wc-dash-inspect-btn.is-active {
+  background: #b39ddb;
+  color: var(--wcds-ink);
+  border-color: #b39ddb;
+}
+.wc-dash-inspect-hover, .wc-dash-inspect-sel {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+  box-sizing: border-box;
+}
+.wc-dash-inspect-hover {
+  border: 2px dashed #b39ddb;
+  background: rgba(179,157,219,0.12);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.50);
+}
+.wc-dash-inspect-sel {
+  border: 3px solid #b39ddb;
+  background: rgba(179,157,219,0.18);
+  box-shadow: 0 0 0 1px rgba(31,15,11,0.85), 0 0 0 4px rgba(179,157,219,0.35);
+}
+.wc-dash-inspect-tooltip {
+  position: absolute;
+  top: -24px; left: 0;
+  background: #b39ddb;
+  color: var(--wcds-ink);
+  font: inherit; font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 3px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Replace dialog */
+.wc-dash-replace-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.wc-dash-replace-dialog {
+  width: 640px;
+  max-width: 90vw;
+  max-height: 80vh;
+  background: var(--wcds-ink);
+  color: var(--wcds-cream);
+  border: 1px solid rgba(179,157,219,0.45);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  font: inherit; font-size: 12px;
+}
+.wc-dash-replace-header {
+  display: flex; align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(249,240,237,0.16);
+}
+.wc-dash-replace-title {
+  flex: 1;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.wc-dash-replace-close {
+  background: transparent; border: none;
+  color: var(--wcds-cream-dim);
+  font: inherit; font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.wc-dash-replace-close:hover { color: var(--wcds-cream); }
+.wc-dash-replace-body {
+  padding: 14px 16px;
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.wc-dash-replace-row { display: flex; flex-direction: column; gap: 4px; }
+.wc-dash-replace-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wcds-cream-dim);
+}
+.wc-dash-replace-target {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  background: rgba(179,157,219,0.10);
+  border: 1px solid rgba(179,157,219,0.30);
+  padding: 6px 8px;
+  border-radius: 4px;
+  word-break: break-all;
+}
+.wc-dash-replace-select {
+  background: rgba(249,240,237,0.06);
+  border: 1px solid rgba(249,240,237,0.20);
+  color: var(--wcds-cream);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font: inherit;
+}
+.wc-dash-replace-select:focus { outline: 2px solid #b39ddb; outline-offset: -2px; }
+.wc-dash-replace-preview {
+  width: 100%;
+  height: 280px;
+  background: var(--wcds-cream);
+  border: 1px solid rgba(249,240,237,0.20);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.wc-dash-replace-preview iframe {
+  width: 100%; height: 100%;
+  border: none; display: block;
+  background: #fff;
+}
+.wc-dash-replace-preview-empty {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(31,15,11,0.45);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.wc-dash-replace-footer {
+  display: flex; align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(249,240,237,0.16);
+}
+.wc-dash-replace-note {
+  flex: 1;
+  color: var(--wcds-cream-dim);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+.wc-dash-replace-cancel,
+.wc-dash-replace-apply {
+  background: transparent;
+  border: 1px solid rgba(249,240,237,0.20);
+  color: var(--wcds-cream);
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit; font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.wc-dash-replace-cancel:hover { background: rgba(249,240,237,0.06); }
+.wc-dash-replace-apply {
+  background: #b39ddb;
+  color: var(--wcds-ink);
+  border-color: #b39ddb;
+  font-weight: 600;
+}
+.wc-dash-replace-apply:hover:not(:disabled) { background: #c5b3e3; border-color: #c5b3e3; }
+.wc-dash-replace-apply:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Drag-drop reorder — sidebar item → iframe insertion
+ * v2-mapped sidebar items get the grab cursor + slight purple tint while
+ * being dragged. The iframe's drop indicator is injected as a styled
+ * <div id="__wc-dnd-indicator"> by the binding effect (inline styles).
+ * ───────────────────────────────────────────────────────────────────────── */
+.wc-dash-item.is-draggable { cursor: grab; }
+.wc-dash-item.is-draggable:active { cursor: grabbing; }
+body.wc-dash-dragging .wc-dash-iframe { outline: 2px dashed rgba(179,157,219,0.55); outline-offset: -2px; }
+body.wc-dash-dragging { user-select: none; }
+
+/* ── v3 Tailwind token-picker (edit panel) — tokens-PROMINENT (mock-v2) ── */
+/* Panel header: "Edit · Tailwind" */
+.wc-dash-edit-panel-title { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--wcds-cream); }
+.wc-tw-twword { color: var(--wcds-yellow, #f5ac53); }
+
+/* Device-mode segmented control (one per panel) */
+.wc-tw-bp { padding: 2px 0 10px; margin-bottom: 8px; border-bottom: 1px solid rgba(249,240,237,0.14); }
+.wc-tw-bp-label { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--wcds-cream-dim); margin-bottom: 6px; }
+.wc-tw-seg { display: flex; gap: 3px; background: var(--wcds-ink, #1b1a17); border: 1px solid rgba(249,240,237,0.14); border-radius: 9px; padding: 3px; }
+.wc-tw-segbtn { flex: 1; position: relative; padding: 7px 4px 6px; font: inherit; font-size: 11px; border: none; background: transparent; color: var(--wcds-cream-dim); border-radius: 6px; cursor: pointer; }
+.wc-tw-segbtn.is-active { background: var(--wcds-yellow, #f5ac53); color: var(--wcds-ink, #1b1a17); font-weight: 700; }
+.wc-tw-segdot { position: absolute; top: 4px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--wcds-blue, #4e8abe); }
+.wc-tw-segbtn.is-active .wc-tw-segdot { background: var(--wcds-ink, #1b1a17); }
+.wc-tw-bpctx { margin-top: 8px; font-size: 11px; line-height: 1.4; color: var(--wcds-cream-dim); }
+.wc-tw-bpctx b { color: var(--wcds-yellow, #f5ac53); }
+.wc-tw-bpctx code { font-family: ui-monospace, monospace; background: rgba(249,240,237,0.10); color: var(--wcds-cream); padding: 1px 4px; border-radius: 3px; }
+.wc-tw-ctx-hint { color: var(--wcds-cream-dim); opacity: .8; }
+
+/* Section title */
+.wc-tw-sectitle { color: var(--wcds-yellow, #f5ac53); display: flex; align-items: baseline; }
+.wc-tw-secfig { margin-left: auto; font-size: 10px; font-weight: 500; color: var(--wcds-cream-dim); text-transform: none; letter-spacing: 0; }
+.wc-tw-perside { margin-left: 8px; align-self: center; font: inherit; font-size: 9px; font-family: ui-monospace, monospace; text-transform: none; letter-spacing: 0; padding: 1px 6px; border: 1px solid rgba(249,240,237,0.2); background: transparent; color: var(--wcds-cream-dim); border-radius: 4px; cursor: pointer; }
+.wc-tw-perside:hover { color: var(--wcds-cream); border-color: rgba(249,240,237,0.4); }
+.wc-tw-perside.is-on { background: var(--wcds-yellow,#f5ac53); color: var(--wcds-ink,#1b1a17); border-color: var(--wcds-yellow,#f5ac53); }
+
+/* class-PRIMARY row */
+.wc-tw-row { margin-bottom: 16px; }
+/* Dim the muted/css-baseline row content, but NEVER the R3 conflict warning —
+   a mask warning is high-salience actionable info, must not inherit de-emphasis.
+   (opacity on the row is a group the child can't escape, so exclude the box.) */
+.wc-tw-row.is-inherited > *:not(.wc-tw-conflict) { opacity: .7; }
+.wc-tw-rh { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.wc-tw-label { font-size: 12px; color: var(--wcds-cream); border-bottom: 1px dotted var(--wcds-cream-dim); cursor: help; margin-top: 3px; white-space: nowrap; }
+.wc-tw-vstack { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; min-width: 0; }
+.wc-tw-cls { font-size: 15px; font-weight: 700; font-family: ui-monospace, monospace; letter-spacing: -.02em; line-height: 1.15; text-align: right; word-break: break-all; }
+.wc-tw-pfx { color: var(--wcds-blue, #4e8abe); font-weight: 600; }   /* breakpoint prefix → teaches WHICH viewport */
+.wc-tw-util { color: var(--wcds-cream); }                            /* the utility itself */
+.wc-tw-unset-cls { color: var(--wcds-cream-dim); }
+.wc-tw-px { font-size: 11px; font-weight: 500; color: var(--wcds-cream-dim); }   /* px = small secondary teach-value */
+.wc-tw-row.is-inherited .wc-tw-pfx, .wc-tw-row.is-inherited .wc-tw-util { color: var(--wcds-cream-dim); }
+
+/* slider + class-labeled ticks */
+.wc-tw-slider { width: 100%; accent-color: var(--wcds-yellow, #f5ac53); margin: 2px 0 0; cursor: pointer; }
+.wc-tw-slider.is-inh { accent-color: var(--wcds-cream-dim); }
+.wc-tw-ticks { display: flex; justify-content: space-between; margin-top: 2px; }
+.wc-tw-tick { font-size: 8px; color: var(--wcds-cream-dim); font-family: ui-monospace, monospace; opacity: .65; }
+
+.wc-tw-foot { font-size: 10px; min-height: 13px; margin-top: 6px; }
+.wc-tw-reset { font: inherit; font-size: 10px; color: var(--wcds-blue, #4e8abe); background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; }
+.wc-tw-inh { color: var(--wcds-cream-dim); font-style: italic; }
+.wc-tw-inh code { font-family: ui-monospace, monospace; color: var(--wcds-cream); }
+.wc-tw-unset { color: var(--wcds-cream-dim); opacity: .8; }
+
+/* off-scale arbitrary-value escape hatch */
+.wc-tw-offscale { margin-top: 8px; font-size: 10px; color: var(--wcds-cream-dim); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.wc-tw-arb { width: 52px; font: inherit; font-size: 10px; background: var(--wcds-ink, #1b1a17); border: 1px solid rgba(249,240,237,0.14); color: var(--wcds-cream); border-radius: 4px; padding: 2px 5px; }
+.wc-tw-offscale code { font-family: ui-monospace, monospace; color: var(--wcds-cream); background: var(--wcds-ink, #1b1a17); padding: 1px 5px; border-radius: 4px; }
+
+/* enum control — pick-one class chips */
+.wc-tw-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.wc-tw-chip { font: inherit; font-size: 10px; font-family: ui-monospace, monospace; padding: 3px 7px; border: 1px solid rgba(249,240,237,0.16); background: var(--wcds-ink, #1b1a17); color: var(--wcds-cream-dim); border-radius: 5px; cursor: pointer; }
+.wc-tw-chip:hover { color: var(--wcds-cream); border-color: rgba(249,240,237,0.3); }
+.wc-tw-chip.is-active { background: var(--wcds-yellow, #f5ac53); color: var(--wcds-ink, #1b1a17); border-color: var(--wcds-yellow, #f5ac53); font-weight: 700; }
+.wc-tw-chip.is-cssbase { border-style: dashed; border-color: var(--wcds-cream-dim); color: var(--wcds-cream); }
+/* R3 — masked-dimension conflict surface (width/height capped by max-*) */
+.wc-tw-conflict { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; padding: 6px 8px; border-radius: 6px; background: rgba(237,90,53,0.10); border: 1px solid rgba(237,90,53,0.35); }
+.wc-tw-conflict-msg { font-size: 11px; line-height: 1.35; color: var(--wcds-cream); }
+.wc-tw-conflict-msg code { font-family: ui-monospace, monospace; color: #ed5a35; }
+.wc-tw-conflict-rm { font: inherit; font-size: 10px; font-family: ui-monospace, monospace; padding: 3px 8px; border: 1px solid rgba(237,90,53,0.5); background: transparent; color: #ed5a35; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+.wc-tw-conflict-rm:hover { background: #ed5a35; color: var(--wcds-ink, #1b1a17); border-color: #ed5a35; }
+
+/* color control — brand swatches */
+.wc-tw-swatches { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+.wc-tw-swatch { width: 20px; height: 20px; border-radius: 5px; border: 1px solid rgba(249,240,237,0.25); cursor: pointer; padding: 0; }
+.wc-tw-swatch.is-active { outline: 2px solid var(--wcds-yellow, #f5ac53); outline-offset: 1px; }
+.wc-tw-arb-hex { width: 72px; }

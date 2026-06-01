@@ -1,0 +1,106 @@
+/* =========================================================================
+   Wildcard Design System v3 — Tailwind v4 entry (CSS-first)
+
+   This file wires Tailwind v4 and ports the brand design tokens into the
+   Tailwind `@theme` so utilities like `bg-wc-yellow`, `text-display-2xl`,
+   `font-display` exist — and the default spacing scale (`p-4`/`p-8`/`p-12`)
+   + breakpoints (`md:`/`lg:`) power the v3 edit-mode Tailwind-class picker.
+
+   IMPORTANT — Preflight is intentionally OMITTED.
+   The project already ships its own `reset.css`. Tailwind's Preflight reset
+   is the most common source of subtle visual drift, and v3 must look
+   IDENTICAL to v2 in this scaffold phase. So instead of `@import "tailwindcss"`
+   (which bundles Preflight in `@layer base`), we import only `theme.css`
+   (default theme vars) + `utilities.css` (the utility classes). If border
+   utilities are needed later, set `border-style` explicitly per element.
+
+   Layer order: existing project CSS is UNLAYERED and therefore always wins
+   over Tailwind's `@layer` CSS — so adding Tailwind cannot restyle existing
+   components. Utilities only take effect where we explicitly add classes.
+   ========================================================================= */
+
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme {
+  /* ---------------------------------------------------------------------
+     COLORS — brand palette. Referenced from tokens.css custom props so
+     `src/styles/tokens.css` stays the single source of truth for values.
+     Generates: bg-*, text-*, border-*, fill-*, ring-*, etc.
+     --------------------------------------------------------------------- */
+  --color-wc-black:        var(--wc-black);
+  --color-wc-white:        var(--wc-white);
+  --color-wc-yellow:       var(--wc-yellow);
+  --color-wc-blue:         var(--wc-blue);
+  --color-wc-red:          var(--wc-red);
+  --color-wc-purple:       var(--wc-purple);
+  --color-wc-green:        var(--wc-green);
+  --color-wc-yellow-deep:  var(--wc-yellow-deep);
+  --color-wc-yellow-bright:var(--wc-yellow-bright);
+  --color-wc-red-deep:     var(--wc-red-deep);
+  --color-wc-blue-deep:    var(--wc-blue-deep);
+  --color-wc-cream-soft:   var(--wc-cream-soft);
+  --color-wc-cream-warm:   var(--wc-cream-warm);
+
+  /* Semantic role colors (mirror tokens.css semantic mappings) */
+  --color-ink:    var(--wc-ink);
+  --color-paper:  var(--wc-paper);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --color-link:   var(--link);
+
+  /* ---------------------------------------------------------------------
+     FONT FAMILIES — literal values (Tailwind's `--font-*` namespace
+     collides with tokens.css `--font-*`, so a var() self-reference would
+     be circular). KEEP IN SYNC with tokens.css `--font-display/body/mono`.
+     Generates: font-display, font-body, font-mono.
+     --------------------------------------------------------------------- */
+  --font-display: 'Roc Grotesk', 'Saira', 'Arial Black', sans-serif;
+  --font-body:    'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    'SF Mono', ui-monospace, 'JetBrains Mono', monospace;
+
+  /* ---------------------------------------------------------------------
+     TYPE SCALE — referenced from tokens.css `--fs-*` (single source).
+     Generates: text-display-2xl … text-caption.
+     --------------------------------------------------------------------- */
+  --text-display-2xl: var(--fs-display-2xl);
+  --text-display-xl:  var(--fs-display-xl);
+  --text-display-lg:  var(--fs-display-lg);
+  --text-display-md:  var(--fs-display-md);
+  --text-display-sm:  var(--fs-display-sm);
+  --text-display-xs:  var(--fs-display-xs);
+  --text-body-xl:     var(--fs-body-xl);
+  --text-body-lg:     var(--fs-body-lg);
+  --text-body-md:     var(--fs-body-md);
+  --text-body-sm:     var(--fs-body-sm);
+  --text-body-xs:     var(--fs-body-xs);
+  --text-caption:     var(--fs-caption);
+}
+
+/* =========================================================================
+   PICKER SAFELIST (v3 edit-mode)
+   The Tailwind-class picker applies classes to elements at RUNTIME (not in
+   source), so the JIT scanner can't see them. `@source inline(...)` force-
+   generates the finite pickable universe. Paradigm = DESKTOP-FIRST: base =
+   Desktop, scale DOWN via EXACT site breakpoints `max-[1180px]:` (≤1180,
+   "Tablet"), `max-[860px]:` (≤860, "Mobile"), `max-[480px]:` (≤480).
+
+   Full spacing pick-universe via brace expansion: {base, 3 max-variants} ×
+   {padding/margin/gap props} × {Tailwind scale steps}. Verified to generate. */
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}{p,px,py,pt,pb,pl,pr,m,mx,my,mt,mb,ml,mr,gap,gap-x,gap-y}-{0,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,9,10,11,12,14,16,20,24,28,32}");
+
+/* All-sections picker (mock-v3) — finite enum/named classes, desktop-first
+   4 tiers (Desktop/Tablet=max-[1180px]/Mobile=max-[860px]/Phone=max-[480px]).
+   Arbitrary tokens (text-[19px], w-[520px], bg-[#hex]) are NOT here — they
+   render via Dashboard's injected media-queried preview stylesheet. */
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}{flex,grid,block,inline-block,hidden,flex-row,flex-col,relative,absolute,fixed,sticky,static,uppercase,lowercase,capitalize,normal-case}");
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}justify-{start,center,between,end,around}");
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}items-{start,center,end,stretch,baseline}");
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}rounded{,-none,-sm,-md,-lg,-xl,-2xl,-3xl,-full}");
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}font-{normal,medium,semibold,bold,black}");
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}tracking-{tight,normal,wide}");
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}text-{left,center,right}");
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}{w,max-w,h}-{full,auto,none}");
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}leading-none");
+@source inline("{,max-[1180px]:,max-[860px]:,max-[480px]:}opacity-{0,5,10,20,25,30,40,50,60,70,75,80,90,95,100}");

@@ -1,0 +1,604 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8">
+<title>Hero</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="../bg-line.css">
+<link rel="stylesheet" href="../btn.css">
+<style>
+/* =========================================================================
+   HERO — Wildcard
+
+   Two-column hero on the shared `.wc-bgline` background.
+
+   Container model
+   ---------------
+   .hero-inner is a centered, max-width 1280px container. Inside it:
+     · .hero-copy = LEFT column (copy + CTAs + info lines), width-capped
+     · .hero-cluster = anchored absolutely. Its LEFT edge sits at the right
+       edge of .hero-copy. Its RIGHT edge can overflow past the container's
+       right edge — bleeding outward, NOT into the viewport edge. That's
+       why the cluster is positioned by `left:` measured from the container
+       and given its own explicit width; we don't let it stretch to the
+       container's right edge.
+
+   Icon stair pattern
+   ------------------
+   4 columns × 2 tiles each = 8 brand-icon tiles. ALL tiles identical size.
+   Y position per column (in units of step):
+     col1 = 0 (lowest)   col2 = -1   col3 = -2 (highest)   col4 = 0 (restart)
+   This produces the user's "1 lower, 2 higher, 3 even higher, then restart"
+   stair pattern, repeated across the cluster.
+
+   Decorative type
+   ---------------
+   Only the FIRST WORD of each line is decorative: DRINK / PLAY get the
+   color-cycle + up/down bounce. BOLDLY / WILD stay plain white.
+
+   Food & Drink band
+   -----------------
+   Photo strip uses width:100vw breakout so it actually bleeds edge-to-edge
+   of the VIEWPORT. The scalloped FOOD & DRINK card floats above the strip
+   and straddles the yellow wave from the hero above. Spacing between hero
+   copy and the card is preserved — no overlap.
+   ========================================================================= */
+
+html {
+  overflow-x: clip;          /* prevent trackpad horizontal scroll on the    *
+                              * 100vw breakout + cluster right-side overflow  */
+}
+body {
+  margin: 0;
+  background: var(--wc-white);
+  font-family: var(--font-body);
+  overflow-x: clip;          /* hide the cluster's right-side overflow + *
+                              * the image strip's viewport-edge breakout */
+}
+
+/* ── HERO SECTION ─────────────────────────────────────────────────── */
+.hero {
+  --hero-pad-x: 80px;
+  --hero-pad-top: 110px;
+  /* min-height pushes the yellow wave DOWN — the wave band sits at the
+     bottom of the section, so taller section = lower wave relative to
+     content. Tweakable via --hero-min-h.                                */
+  min-height: var(--hero-min-h, 920px);
+  padding-top: var(--hero-pad-top);
+  padding-right: var(--hero-pad-x);
+  padding-left: var(--hero-pad-x);
+  color: var(--wc-white);
+}
+
+.hero-inner {
+  position: relative;            /* anchor for absolute .hero-cluster */
+  z-index: 2;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: block;                /* not grid — copy is width-capped     *
+                                  * directly; cluster is absolute       */
+}
+
+/* ── LEFT COLUMN — copy ───────────────────────────────────────────── */
+.hero-copy {
+  max-width: var(--hero-copy-w, 720px);
+  position: relative;
+  z-index: 2;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
+  font-weight: 500;
+  font-size: var(--hero-h1-size, 96px);
+  line-height: 1.04;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  margin: 0 0 24px;
+  color: var(--wc-white);
+}
+.hero h1 .line { display: flex; align-items: baseline; gap: var(--hero-word-gap, 20px); white-space: nowrap; }
+.hero h1 .plain { color: var(--wc-white); }
+
+.hero h1 .deco {
+  display: inline-flex;
+  gap: 0.015em;
+  vertical-align: baseline;
+}
+.hero h1 .deco span {
+  display: inline-block;
+  line-height: 1;
+}
+.hero h1 .deco span:nth-child(odd)  { transform: translateY(-6px); }
+.hero h1 .deco span:nth-child(even) { transform: translateY( 4px); }
+.hero h1 .deco span:nth-child(5n+1) { color: var(--wc-yellow); }
+.hero h1 .deco span:nth-child(5n+2) { color: var(--wc-blue);   }
+.hero h1 .deco span:nth-child(5n+3) { color: var(--wc-red);    }
+.hero h1 .deco span:nth-child(5n+4) { color: var(--wc-purple); }
+.hero h1 .deco span:nth-child(5n+5) { color: var(--wc-green);  }
+
+.hero .lede {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 19px;
+  line-height: 1.45;
+  color: rgba(249,240,237,0.92);
+  margin: 0 0 28px;
+  max-width: 520px;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+/* btn-sm styling from shared btn.css — no local overrides */
+
+.hero-info {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hero-info li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--wc-white);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.hero-info svg.bullet {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  display: block;
+}
+
+/* ── ICON CLUSTER (absolute, overflows past container right) ─────── *
+ * Anchored to .hero-inner. left = copy width + gap. Width is fixed,  *
+ * and the cluster extends visually past the container's right edge   *
+ * by however much (cluster.width + cluster.left) exceeds container.  *
+ * The 4-col × 2-tile stair pattern is realized via CSS Grid where    *
+ * each column's tiles are placed via grid-row offsets.                */
+.hero-cluster {
+  --tile: var(--hero-tile, 96px);
+  --gap:  var(--hero-tile-gap, 10px);
+  --step: calc(var(--tile) * 0.5);
+  position: absolute;
+  top: var(--hero-cluster-top, 0px);
+  left: calc(var(--hero-copy-w, 720px) + var(--hero-cluster-gap, 48px));
+  width: calc(4 * var(--tile) + 3 * var(--gap));
+  height: calc(2 * var(--tile) + var(--gap) + 2 * var(--step));
+  pointer-events: none;
+  /* Uniform scale of the entire cluster — fine-tune overall size without
+     touching individual tile/gap values. */
+  transform: scale(var(--hero-cluster-scale, 1));
+  transform-origin: top left;
+}
+.hero-cluster .tile {
+  position: absolute;
+  width: var(--tile);
+  height: var(--tile);
+  display: block;
+}
+.hero-cluster .tile svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* Column X position helper:
+   colN_left = (N-1) * (tile + gap)
+   Column Y offset helper (top of column):
+   col1 = 2*step (lowest)
+   col2 = 1*step
+   col3 = 0       (highest)
+   col4 = 2*step  (restart pattern)
+   Each column has 2 tiles: top tile at colY, bottom tile at colY + tile + gap.
+*/
+.hero-cluster .c1-top    { left: calc(0 * (var(--tile) + var(--gap)));
+                           top:  calc(2 * var(--step)); }
+.hero-cluster .c1-bottom { left: calc(0 * (var(--tile) + var(--gap)));
+                           top:  calc(2 * var(--step) + var(--tile) + var(--gap)); }
+
+.hero-cluster .c2-top    { left: calc(1 * (var(--tile) + var(--gap)));
+                           top:  calc(1 * var(--step)); }
+.hero-cluster .c2-bottom { left: calc(1 * (var(--tile) + var(--gap)));
+                           top:  calc(1 * var(--step) + var(--tile) + var(--gap)); }
+
+.hero-cluster .c3-top    { left: calc(2 * (var(--tile) + var(--gap)));
+                           top:  0; }
+.hero-cluster .c3-bottom { left: calc(2 * (var(--tile) + var(--gap)));
+                           top:  calc(var(--tile) + var(--gap)); }
+
+.hero-cluster .c4-top    { left: calc(3 * (var(--tile) + var(--gap)));
+                           top:  calc(2 * var(--step)); }
+.hero-cluster .c4-bottom { left: calc(3 * (var(--tile) + var(--gap)));
+                           top:  calc(2 * var(--step) + var(--tile) + var(--gap)); }
+
+/* ── FOOD & DRINK band ────────────────────────────────────────────── *
+ * Sits BELOW the hero copy, separated by guaranteed margin. The card  *
+ * floats over a photo strip that bleeds edge-to-edge of the VIEWPORT  *
+ * (width:100vw breakout). The card pulls UP into the hero's wave by   *
+ * --fd-overlap so it straddles the yellow stroke, but never overlaps  *
+ * the hero copy because the copy column already cleared above it.      */
+.hero-fd {
+  position: relative;
+  width: 100vw;                     /* viewport-wide breakout            */
+  margin-left: 50%;
+  transform: translateX(-50%);
+  /* Negative top margin pulls the card's center toward the wave. The
+     vertical gap from the hero copy is preserved via .hero's bottom
+     padding (.wc-bgline supplies wave-h px). To increase clearance from
+     the hero text, raise --hero-fd-bottom-gap (tweakable).             */
+  margin-top: var(--hero-fd-margin-top, -120px);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-fd .photos {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  background: var(--wc-red);
+  padding: 10px;
+  width: 100%;            /* edge to edge of viewport */
+}
+.hero-fd .photos .photo {
+  aspect-ratio: 1 / 1;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: rgba(0,0,0,0.18);
+}
+
+.hero-fd .card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--hero-fd-card-w, 540px);
+  max-width: calc(100vw - 64px);
+  z-index: 2;
+}
+.hero-fd .card .scallop { display: block; width: 100%; height: auto; }
+.hero-fd .card .inner {
+  position: absolute;
+  inset: 0;
+  padding: 64px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+}
+.hero-fd .fd-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+}
+.hero-fd .fd-title-row svg {
+  width: 44px; height: 44px;
+  display: block;
+  flex: none;
+}
+.hero-fd .card h2 {
+  font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
+  font-weight: 500;
+  font-size: 48px;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--wc-ink);
+  margin: 0;
+}
+.hero-fd .card p {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--wc-ink);
+  margin: 0;
+  max-width: 360px;
+  text-wrap: pretty;
+}
+/* FD card button — uses shared .btn-sm .btn-red */
+.hero-fd .card .btn { margin-top: 6px; }
+
+/* ── Responsive ───────────────────────────────────────────────────── */
+@media (max-width: 1180px) {
+  .hero { --hero-pad-x: 56px; --hero-pad-top: 96px; }
+  .hero-copy { max-width: calc(60% - 24px); }
+  .hero-cluster { --tile: 80px; left: calc(60% + 24px); }
+}
+@media (max-width: 880px) {
+  .hero { --hero-pad-x: 32px; --hero-pad-top: 64px; }
+  .hero-copy { max-width: 100%; padding-right: 0; }
+  .hero h1 { font-size: clamp(44px, 11vw, 64px); }
+  .hero-cluster {
+    position: static;
+    margin-top: 32px;
+    width: 100%;
+    --tile: 64px;
+    height: calc(2 * 64px + 10px + 64px);  /* tile*2 + gap + 2*step    */
+  }
+  .hero-fd .photos { grid-template-columns: repeat(6, 1fr); }
+  .hero-fd .card { width: min(540px, calc(100vw - 48px)); }
+  .hero-fd .card .inner { padding: 48px 32px; }
+  .hero-fd .card h2 { font-size: 36px; }
+}
+
+/* Tweaks mount */
+#tweaks-root { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+#tweaks-root > * { pointer-events: auto; }
+</style>
+</head>
+<body>
+
+<!-- Inline brand-icon sprite -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="i-martini" viewBox="0 0 125 125"><g >
+<path d="M114.29 0H10.48C4.69206 0 0 4.69206 0 10.48V114.29C0 120.078 4.69206 124.77 10.48 124.77H114.29C120.078 124.77 124.77 120.078 124.77 114.29V10.48C124.77 4.69206 120.078 0 114.29 0Z" fill="#F5AC53"></path>
+<path d="M65.02 103.1V53.1099L96.48 14.9399H28.29L59.75 53.1099V103.1C52.13 103.36 46.32 104.74 46.32 106.4C46.32 108.25 53.52 109.75 62.39 109.75C71.26 109.75 78.46 108.25 78.46 106.4C78.46 104.74 72.64 103.36 65.03 103.1H65.02Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-wine" viewBox="0 0 125 125"><g >
+<path d="M113.76 0H11.01C4.92935 0 0 4.92935 0 11.01V113.76C0 119.841 4.92935 124.77 11.01 124.77H113.76C119.841 124.77 124.77 119.841 124.77 113.76V11.01C124.77 4.92935 119.841 0 113.76 0Z" fill="#F5AC53"></path>
+<path d="M32.5701 14.9399V24.8799C32.5701 41.1799 44.4201 54.9199 59.7501 56.1999V103.1C52.1301 103.36 46.3201 104.74 46.3201 106.4C46.3201 108.25 53.5201 109.75 62.3901 109.75C71.2601 109.75 78.4601 108.25 78.4601 106.4C78.4601 104.74 72.6401 103.36 65.0301 103.1V56.1799C80.3001 54.7899 92.2101 41.2099 92.2101 24.8699V14.9499H32.5901L32.5701 14.9399Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-flute" viewBox="0 0 125 125"><g >
+<path d="M113.95 0H10.82C4.84428 0 0 4.84428 0 10.82V113.95C0 119.926 4.84428 124.77 10.82 124.77H113.95C119.926 124.77 124.77 119.926 124.77 113.95V10.82C124.77 4.84428 119.926 0 113.95 0Z" fill="#F5AC53"></path>
+<path d="M65.02 103.14V70.4599C69.81 65.8199 73.34 48.7199 73.34 28.5599V14.9399H51.42V28.5799C51.42 48.6799 54.94 65.9499 59.74 70.5199V103.14C54.61 103.49 50.78 104.81 50.78 106.4C50.78 108.25 55.97 109.75 62.37 109.75C68.77 109.75 73.96 108.25 73.96 106.4C73.96 104.81 70.13 103.48 65 103.14H65.02Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-beer" viewBox="0 0 125 125"><g >
+<path d="M113.64 0H11.13C4.98307 0 0 4.98307 0 11.13V113.64C0 119.787 4.98307 124.77 11.13 124.77H113.64C119.787 124.77 124.77 119.787 124.77 113.64V11.13C124.77 4.98307 119.787 0 113.64 0Z" fill="#F5AC53"></path>
+<path d="M74.79 62.1702C74.87 59.0702 74.05 56.0402 72.49 53.6902C71.28 51.8602 70.47 49.6502 70.13 47.2802L65.98 17.9602C66.23 17.9202 66.43 17.7102 66.43 17.4402V16.8002C66.43 16.6702 66.38 16.5502 66.3 16.4602C66.38 16.3702 66.43 16.2502 66.43 16.1202V15.4802C66.43 15.1902 66.19 14.9502 65.9 14.9502H58.89C58.6 14.9502 58.36 15.1902 58.36 15.4802V16.1202C58.36 16.2502 58.41 16.3702 58.49 16.4602C58.41 16.5502 58.36 16.6702 58.36 16.8002V17.4402C58.36 17.7002 58.56 17.9102 58.81 17.9602L54.66 47.2702C54.32 49.6502 53.51 51.8602 52.29 53.6902C50.73 56.0402 49.91 59.0702 49.99 62.1802V108.69C50 109.33 50.46 109.83 51.02 109.83H73.76C74.32 109.83 74.78 109.32 74.8 108.69V62.1702H74.79Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-cd" viewBox="0 0 125 125"><g >
+<path d="M114.2 0H10.57C4.73235 0 0 4.73235 0 10.57V114.2C0 120.038 4.73235 124.77 10.57 124.77H114.2C120.038 124.77 124.77 120.038 124.77 114.2V10.57C124.77 4.73235 120.038 0 114.2 0Z" fill="#F5AC53"></path>
+<path d="M62.39 15.0098C36.23 15.0098 15.02 36.2198 15.02 62.3798C15.02 88.5398 36.23 109.75 62.39 109.75C88.55 109.75 109.76 88.5398 109.76 62.3798C109.76 36.2198 88.55 15.0098 62.39 15.0098ZM62.39 72.9998C56.53 72.9998 51.77 68.2498 51.77 62.3798C51.77 56.5098 56.52 51.7598 62.39 51.7598C68.26 51.7598 73.01 56.5098 73.01 62.3798C73.01 68.2498 68.26 72.9998 62.39 72.9998Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-chess" viewBox="0 0 125 125"><g >
+<path d="M113.66 0H11.11C4.97412 0 0 4.97412 0 11.11V113.66C0 119.796 4.97412 124.77 11.11 124.77H113.66C119.796 124.77 124.77 119.796 124.77 113.66V11.11C124.77 4.97412 119.796 0 113.66 0Z" fill="#F5AC53"></path>
+<path d="M96.2401 104.81V108.03C96.2401 109.03 95.5201 109.76 94.4401 109.76H30.3501C29.2501 109.76 28.5601 109.03 28.5601 108.03L28.5301 105C28.4801 99.0002 31.7201 93.5802 37.2701 90.9102C35.2901 88.7402 34.7001 85.7702 36.0201 83.0802C37.2201 80.6102 39.8901 79.0702 42.8701 79.3202L45.3201 75.6002C47.5801 72.1702 48.8401 68.1702 48.8401 64.0302V59.0202C44.9601 58.9302 42.1401 55.9502 42.0901 52.3302C42.0301 48.6202 44.9601 45.5802 48.7701 45.4802L52.0801 45.4002C44.1301 39.1702 43.2701 27.8002 49.8801 20.5502C56.5301 13.2302 68.0801 13.1802 74.7901 20.4502C81.4901 27.6802 80.6901 39.1502 72.6901 45.4002C73.6601 45.4702 74.6001 45.5002 75.5701 45.4802C79.4101 45.3702 82.5201 48.2402 82.6701 51.9602C82.8301 55.7302 79.9501 58.9502 75.9401 59.0402V64.2502C75.9401 68.2802 77.1801 72.1602 79.3701 75.4902L81.9001 79.3302C84.8301 79.0902 87.4501 80.5602 88.6801 82.9702C90.0301 85.6002 89.5901 88.6402 87.4801 90.9102C92.8901 93.5302 96.2401 98.8402 96.2201 104.83L96.2401 104.81Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-meeple" viewBox="0 0 125 125"><g >
+<path d="M111.286 123.96H13.2118C6.14231 123.96 0.410156 118.229 0.410156 111.158V13.0841C0.410156 6.01463 6.14231 0.283691 13.2118 0.283691H111.286C118.355 0.283691 124.088 6.01463 124.088 13.0841V111.158C124.088 118.229 118.355 123.96 111.286 123.96Z" fill="#F5AC53"></path>
+<path d="M72.685 102.416L71.6154 100.781L70.3301 98.7575L69.693 97.7715L63.5768 88.4816C63.2425 87.974 62.3158 87.9474 61.8942 88.0091C61.2765 88.1012 60.8706 88.4816 60.4927 89.0703L53.0889 100.577L51.6631 102.776C51.2331 103.438 50.8733 104.066 50.0847 104.417L24.846 104.418C24.0138 104.418 23.1986 103.718 23.075 102.96C22.9163 101.974 23.1744 101.049 23.3791 100.063C24.3966 95.1707 26.2282 90.5833 28.4886 86.1449L30.3759 82.7858C30.5576 82.4611 30.6981 82.1801 30.8919 81.8615L33.6829 77.2729C35.105 74.9337 36.3915 72.6455 37.5835 70.1864C38.2182 68.8769 38.9026 67.622 38.9656 66.1247C38.9959 65.4003 38.2025 64.7414 37.5278 64.7087L35.2431 64.6008C31.4588 64.4203 28.0573 64.8298 24.2186 62.9994C21.7595 61.8268 20.3252 60.1479 19.9933 57.3363C19.699 54.8385 20.6559 52.4703 22.2949 50.56L24.29 48.5055C24.6316 48.1542 25.1065 47.9568 25.4541 47.6358C25.8527 47.2675 26.2561 47.0252 26.6958 46.7151C31.3753 43.419 39.1849 40.4318 44.762 38.8728C45.1605 38.7613 45.4718 38.8231 45.8886 38.5724C46.5439 38.1763 48.3852 38.1981 48.4675 36.1727C48.5959 33.0328 49.1265 29.9475 50.5099 27.1347L51.1374 26.0178C51.7382 24.947 52.4747 23.8871 53.4075 23.0997C53.6618 22.8853 53.9235 22.7738 54.1682 22.5412C55.8944 20.9023 58.1342 20.173 60.4975 19.9247C63.3636 19.6243 66.455 19.9453 68.9116 21.4595C69.3429 21.726 69.63 22.0955 70.1509 22.2614C70.6342 22.4153 70.8619 23.0427 71.2266 23.3383C74.2465 25.7998 75.4821 30.3581 75.9751 34.2175C76.0938 35.1466 75.9266 36.0588 76.2464 37.0012C76.3736 37.3743 76.7976 37.9146 77.207 38.0527C79.4238 38.7965 81.6564 39.2628 83.8223 40.1762C84.5055 40.4657 85.1257 40.6692 85.8174 40.8824C88.1129 41.5887 90.2558 42.502 92.3563 43.5729L93.9977 44.4099C95.3992 45.1246 96.8117 45.8442 97.9915 46.9114L98.7075 47.3681C100.618 48.5867 102.247 50.2353 103.394 52.199L103.887 53.1729C105.222 55.8149 104.471 60.1212 102.469 61.5761C102.126 61.8256 101.885 62.017 101.566 62.2847C99.6547 63.8886 95.3205 64.5015 92.584 64.5718L87.1232 64.7099C86.0354 64.7377 85.4031 65.6305 85.6054 66.6808C85.8707 68.052 86.4691 69.2876 87.0929 70.522L87.6368 71.5977L90.2449 76.2166L93.3884 81.463L94.865 83.9063L97.7057 89.573L99.2841 93.5499C100.365 96.2706 101.055 99.0676 101.498 101.975C101.679 103.162 101.043 104.401 99.748 104.402L74.9127 104.421C73.6202 104.421 73.2689 103.31 72.685 102.416Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-clubs" viewBox="0 0 125 125"><g >
+<path d="M113.66 0H11.11C4.97412 0 0 4.97412 0 11.11V113.66C0 119.796 4.97412 124.77 11.11 124.77H113.66C119.796 124.77 124.77 119.796 124.77 113.66V11.11C124.77 4.97412 119.796 0 113.66 0Z" fill="#F5AC53"></path>
+<path d="M87.1 50.64C85.38 50.64 83.71 50.83 82.1 51.18C84.46 47.52 85.84 43.16 85.84 38.48C85.84 25.52 75.34 15.02 62.38 15.02C49.42 15.02 38.92 25.52 38.92 38.48C38.92 43.05 40.23 47.31 42.49 50.91C41.33 50.73 40.14 50.64 38.92 50.64C25.96 50.64 15.46 61.14 15.46 74.1C15.46 87.06 25.96 97.56 38.92 97.56C44.96 97.56 50.46 95.28 54.61 91.53L51.75 109.75H73.01L69.91 90.06C74.19 94.67 80.31 97.55 87.09 97.55C100.05 97.55 110.55 87.05 110.55 74.09C110.55 61.13 100.05 50.63 87.09 50.63L87.1 50.64Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-diamond" viewBox="0 0 125 125"><g >
+<path d="M114.2 0H10.57C4.73235 0 0 4.73235 0 10.57V114.2C0 120.038 4.73235 124.77 10.57 124.77H114.2C120.038 124.77 124.77 120.038 124.77 114.2V10.57C124.77 4.73235 120.038 0 114.2 0Z" fill="#F5AC53"></path>
+<path d="M62.39 113.6L28.55 62.3902L62.39 11.1802L96.22 62.3902L62.39 113.6Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-heart" viewBox="0 0 125 125"><g >
+<path d="M114.2 0H10.57C4.73235 0 0 4.73235 0 10.57V114.2C0 120.038 4.73235 124.77 10.57 124.77H114.2C120.038 124.77 124.77 120.038 124.77 114.2V10.57C124.77 4.73235 120.038 0 114.2 0Z" fill="#F5AC53"></path>
+<path d="M62.3901 104.46L21.0801 59.1801C9.42006 46.4001 15.1201 25.3501 31.8801 21.0401C39.0301 19.2001 47.1001 20.7201 53.7001 27.3201L62.3801 36.0001L71.0601 27.3201C77.6601 20.7201 85.7301 19.2001 92.8801 21.0401C109.64 25.3501 115.34 46.4001 103.68 59.1801L62.3801 104.46H62.3901Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-spade" viewBox="0 0 125 125"><g >
+<path d="M113.81 0H10.96C4.90696 0 0 4.90696 0 10.96V113.81C0 119.863 4.90696 124.77 10.96 124.77H113.81C119.863 124.77 124.77 119.863 124.77 113.81V10.96C124.77 4.90696 119.863 0 113.81 0Z" fill="#F5AC53"></path>
+<path d="M103.69 60.2898L62.3901 15.0098L21.0801 60.2898C9.42006 73.0698 15.1201 94.1198 31.8801 98.4298C39.0301 100.27 47.1001 98.7498 53.7001 92.1498L54.6701 91.1798L51.7501 109.75H73.0101L70.0901 91.1798L71.0601 92.1498C77.6601 98.7498 85.7301 100.27 92.8801 98.4298C109.64 94.1198 115.34 73.0698 103.68 60.2898H103.69Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-star" viewBox="0 0 125 125"><g >
+<path d="M114.2 0H10.57C4.73235 0 0 4.73235 0 10.57V114.2C0 120.038 4.73235 124.77 10.57 124.77H114.2C120.038 124.77 124.77 120.038 124.77 114.2V10.57C124.77 4.73235 120.038 0 114.2 0Z" fill="#F5AC53"></path>
+<path d="M109.76 54.8798H80.52L101.19 34.1998L90.57 23.5798L69.9 44.2598V15.0098H54.88V44.2598L34.2 23.5798L23.58 34.1998L44.26 54.8798H15.01V69.8998H44.26L23.58 90.5698L34.2 101.19L54.88 80.5198V109.76H69.9V80.5198L90.57 101.19L101.19 90.5698L80.52 69.8998H109.76V54.8798Z" fill="#1B1A17"></path>
+</g></symbol>
+  <symbol id="i-lines" viewBox="0 0 125 125"><g >
+<path d="M114.2 0H10.57C4.73235 0 0 4.73235 0 10.57V114.2C0 120.038 4.73235 124.77 10.57 124.77H114.2C120.038 124.77 124.77 120.038 124.77 114.2V10.57C124.77 4.73235 120.038 0 114.2 0Z" fill="#F5AC53"></path>
+<path d="M15.8301 80.95V66.41L62.3901 48.04V62.48L15.8301 80.95Z" fill="#1B1A17"></path>
+<path d="M62.3901 77.01V62.48L108.94 44V58.54L62.3901 77.01Z" fill="#1B1A17"></path>
+<path d="M62.3901 106.1V91.5698L108.94 73.0898V87.6298L62.3901 106.1Z" fill="#1B1A17"></path>
+<path d="M15.8301 109.76V95.4703L62.3901 77.0103V91.5403L15.8301 109.76Z" fill="#1B1A17"></path>
+<path d="M62.3901 48.04V33.51L108.94 15.02V29.57L62.3901 48.04Z" fill="#1B1A17"></path>
+<path d="M15.8301 51.9802V37.4402L62.3901 18.9702V33.5102L15.8301 51.9802Z" fill="#1B1A17"></path>
+</g></symbol>
+</svg>
+
+<section class="hero wc-bgline" aria-label="Hero" data-screen-label="01 Hero">
+  <!-- Background + line -->
+  <div class="wc-bgline__ink wc-grain" aria-hidden="true"></div>
+
+  <div class="hero-inner">
+    <!-- LEFT col: copy (width-capped) -->
+    <div class="hero-copy">
+      <h1>
+        <span class="line">
+          <span class="deco"><span>D</span><span>R</span><span>I</span><span>N</span><span>K</span></span>
+          <span class="plain">BOLDLY</span>
+        </span>
+        <span class="line">
+          <span class="deco"><span>P</span><span>L</span><span>A</span><span>Y</span></span>
+          <span class="plain">WILD</span>
+        </span>
+      </h1>
+
+      <p class="lede">A social bar and restaurant built for drinks, dinners, dates, and nights that don't end early.</p>
+
+      <div class="hero-ctas">
+        <button class="btn btn-yellow btn-sm" type="button">
+          <span class="btn-label"><span>Reserve in [Location]</span><span>Reserve in [Location]</span></span>
+          <span class="btn-arrow" aria-hidden="true"><svg viewBox="3 4 18 16" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </button>
+        <button class="btn btn-red btn-sm" type="button">
+          <span class="btn-label"><span>Plan an Event</span><span>Plan an Event</span></span>
+          <span class="btn-arrow" aria-hidden="true"><svg viewBox="3 4 18 16" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </button>
+      </div>
+
+      <ul class="hero-info">
+        <li>
+          <svg class="bullet" viewBox="0 0 125 125" aria-hidden="true"><use href="#i-star"/></svg>
+          <span>Formerly Snakes &amp; Lattes</span>
+        </li>
+        <li>
+          <svg class="bullet" viewBox="0 0 125 125" aria-hidden="true"><use href="#i-star"/></svg>
+          <span>Walk-ins welcome. Reservations recommended after 6pm.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- RIGHT cluster: absolute, anchored at right edge of copy column.
+         8 tiles in a 4-col × 2-row stair pattern. Extends past container. -->
+    <div class="hero-cluster" aria-hidden="true">
+      <span class="tile c1-top">   <svg viewBox="0 0 125 125"><use href="#i-flute"/></svg></span>
+      <span class="tile c1-bottom"><svg viewBox="0 0 125 125"><use href="#i-heart"/></svg></span>
+
+      <span class="tile c2-top">   <svg viewBox="0 0 125 125"><use href="#i-martini"/></svg></span>
+      <span class="tile c2-bottom"><svg viewBox="0 0 125 125"><use href="#i-meeple"/></svg></span>
+
+      <span class="tile c3-top">   <svg viewBox="0 0 125 125"><use href="#i-star"/></svg></span>
+      <span class="tile c3-bottom"><svg viewBox="0 0 125 125"><use href="#i-wine"/></svg></span>
+
+      <span class="tile c4-top">   <svg viewBox="0 0 125 125"><use href="#i-star"/></svg></span>
+      <span class="tile c4-bottom"><svg viewBox="0 0 125 125"><use href="#i-spade"/></svg></span>
+    </div>
+  </div>
+
+  <!-- Yellow stroke (canonical bezier). -->
+  <svg class="wc-bgline__stroke"
+       viewBox="0 0 1440 300"
+       preserveAspectRatio="none"
+       aria-hidden="true">
+    <path class="ink-fill" d="M -40 146 C 701 604, 863 -235, 1485 305 L 1500 -20 L -60 -20 Z"/>
+    <path d="M -40 146 C 701 604, 863 -235, 1485 305" />
+  </svg>
+</section>
+
+<!-- FOOD & DRINK band ─ overlapping the wave above, viewport-wide strip -->
+<section class="hero-fd" aria-labelledby="hero-fd-title">
+  <div class="photos" aria-hidden="true">
+    <div class="photo" style="background-image: url('../assets/photography/hero-1.jpg')"></div>
+    <div class="photo" style="background-image: url('../assets/photography/hero-2.jpg')"></div>
+    <div class="photo" style="background-image: url('../assets/photography/hero-3.jpg')"></div>
+    <div class="photo" style="background-image: url('../assets/photography/hero-4.jpg')"></div>
+    <div class="photo" style="background-image: url('../assets/photography/hero-5.jpg')"></div>
+    <div class="photo" style="background-image: url('../assets/photography/hero-6.jpg')"></div>
+    <div class="photo" style="background-image: url('../assets/photography/hero-1.jpg')"></div>
+    <div class="photo" style="background-image: url('../assets/photography/hero-2.jpg')"></div>
+  </div>
+
+  <div class="card">
+    <svg class="scallop" viewBox="-12 -42 724 544" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <path fill="#fdf3f1"
+            d="M 0 0
+               a 39 39 0 0 1 78 0  a 39 39 0 0 1 78 0  a 39 39 0 0 1 78 0
+               a 39 39 0 0 1 78 0  a 39 39 0 0 1 78 0  a 39 39 0 0 1 78 0
+               a 39 39 0 0 1 78 0  a 39 39 0 0 1 78 0  a 39 39 0 0 1 78 0
+               L 700 460
+               a 39 39 0 0 1 -78 0  a 39 39 0 0 1 -78 0  a 39 39 0 0 1 -78 0
+               a 39 39 0 0 1 -78 0  a 39 39 0 0 1 -78 0  a 39 39 0 0 1 -78 0
+               a 39 39 0 0 1 -78 0  a 39 39 0 0 1 -78 0  a 39 39 0 0 1 -78 0
+               Z"/>
+    </svg>
+    <div class="inner">
+      <div class="fd-title-row">
+        <svg viewBox="0 0 125 125"><use href="#i-star"/></svg>
+        <h2 id="hero-fd-title">Food &amp; Drink</h2>
+        <svg viewBox="0 0 125 125"><use href="#i-star"/></svg>
+      </div>
+      <p>From espresso to espresso martinis, our menu is designed for passing plates, sharing bites, settling in, and turning one round into dinner.</p>
+      <button class="btn btn-red btn-sm" type="button">
+        <span class="btn-label"><span>[Location] Menu</span><span>[Location] Menu</span></span>
+        <span class="btn-arrow" aria-hidden="true"><svg viewBox="3 4 18 16" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ── Tweaks ───────────────────────────────────────────────────────── -->
+<div id="tweaks-root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="../tweaks-panel.jsx"></script>
+<script type="text/babel">
+  const HERO_TWEAKS = /*EDITMODE-BEGIN*/{
+    "h1Size": 92,
+    "copyW": 716,
+    "tile": 144,
+    "tileGap": 11,
+    "clusterTop": -2,
+    "clusterGap": 72,
+    "clusterScale": 0.92,
+    "wordGap": 20,
+    "decoBounce": 7,
+    "heroMinH": 796,
+    "fdMarginTop": -514,
+    "fdCardW": 508
+}/*EDITMODE-END*/;
+
+  function HeroTweaks() {
+    const [t, setTweak] = useTweaks(HERO_TWEAKS);
+    React.useEffect(() => {
+      const hero = document.querySelector('.hero');
+      if (!hero) return;
+      hero.style.setProperty('--hero-h1-size',       `${t.h1Size}px`);
+      hero.style.setProperty('--hero-word-gap',      `${t.wordGap}px`);
+      hero.style.setProperty('--hero-copy-w',        `${t.copyW}px`);
+      hero.style.setProperty('--hero-tile',          `${t.tile}px`);
+      hero.style.setProperty('--hero-tile-gap',      `${t.tileGap}px`);
+      hero.style.setProperty('--hero-cluster-top',   `${t.clusterTop}px`);
+      hero.style.setProperty('--hero-cluster-gap',   `${t.clusterGap}px`);
+      hero.style.setProperty('--hero-cluster-scale', t.clusterScale);
+      hero.style.setProperty('--hero-min-h',         `${t.heroMinH}px`);
+      const fd = document.querySelector('.hero-fd');
+      if (fd) {
+        fd.style.setProperty('--hero-fd-margin-top', `${t.fdMarginTop}px`);
+        fd.style.setProperty('--hero-fd-card-w',     `${t.fdCardW}px`);
+      }
+      document.querySelectorAll('.hero h1 .deco span').forEach((el, i) => {
+        const dir = (i % 2 === 0) ? -1 : 1;
+        el.style.transform = `translateY(${dir * t.decoBounce}px)`;
+      });
+    }, [t]);
+
+    return (
+      <TweaksPanel title="Tweaks · hero">
+        <TweakSection label="Headline" />
+        <TweakSlider label="H1 size"           value={t.h1Size}    min={48} max={140} step={1} unit="px"
+                     onChange={(v) => setTweak('h1Size', v)} />
+        <TweakSlider label="Decorative bounce" value={t.decoBounce} min={0}  max={16}  step={1} unit="px"
+                     onChange={(v) => setTweak('decoBounce', v)} />
+        <TweakSlider label="Word gap"          value={t.wordGap}    min={0}  max={60}  step={1} unit="px"
+                     onChange={(v) => setTweak('wordGap', v)} />
+
+        <TweakSection label="Layout" />
+        <TweakSlider label="Hero min height"   value={t.heroMinH}   min={600} max={1800} step={4} unit="px"
+                     onChange={(v) => setTweak('heroMinH', v)} />
+        <TweakSlider label="Copy column width" value={t.copyW}      min={420} max={900} step={4} unit="px"
+                     onChange={(v) => setTweak('copyW', v)} />
+        <TweakSlider label="Cluster gap"       value={t.clusterGap} min={0}   max={120} step={2} unit="px"
+                     onChange={(v) => setTweak('clusterGap', v)} />
+        <TweakSlider label="Cluster top offset" value={t.clusterTop} min={-80} max={120} step={2} unit="px"
+                     onChange={(v) => setTweak('clusterTop', v)} />
+
+        <TweakSection label="Icon cluster" />
+        <TweakSlider label="Group scale" value={t.clusterScale} min={0.4} max={1.6} step={0.02} unit="×"
+                     onChange={(v) => setTweak('clusterScale', v)} />
+        <TweakSlider label="Tile size"   value={t.tile}    min={60} max={160} step={1} unit="px"
+                     onChange={(v) => setTweak('tile', v)} />
+        <TweakSlider label="Gap"         value={t.tileGap} min={4}  max={40}  step={1} unit="px"
+                     onChange={(v) => setTweak('tileGap', v)} />
+
+        <TweakSection label="Food & Drink card" />
+        <TweakSlider label="Card width"   value={t.fdCardW}    min={420} max={780} step={2} unit="px"
+                     onChange={(v) => setTweak('fdCardW', v)} />
+        <TweakSlider label="Vertical pos" value={t.fdMarginTop} min={-600} max={120} step={2} unit="px"
+                     onChange={(v) => setTweak('fdMarginTop', v)} />
+      </TweaksPanel>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('tweaks-root')).render(<HeroTweaks />);
+</script>
+
+</body></html>

@@ -1,0 +1,19 @@
+/* standalone-mount.css
+ *
+ * Originally this file zeroed homepage-composition overlap rules (e.g.
+ * `.hero-fd { margin-top: -514px }`) when sections were mounted standalone
+ * via `?component=<Name>`. Caller-visible regression #79 surfaced: the
+ * overrides (margin-top:96, min-height:540, padding-bottom:40 on `.hero-fd`)
+ * SHIFTED the absolute-positioned card's positioning context — card centered
+ * on the EXPANDED container instead of the photos band, diverging from
+ * homepage instance.
+ *
+ * Architectural fix landed in #79: homepage-composition rules now live behind
+ * a `.wc-home` parent selector (per HomePage.jsx wrapper). Component base
+ * styles are intrinsic-clean. Standalone routes render the component in
+ * its natural form WITHOUT needing any overrides here.
+ *
+ * Keep this file as a no-op placeholder so App.jsx's import doesn't break.
+ * If future components need standalone-only adjustments, add them here. */
+
+/* Intentionally empty — homepage overlap rules now scoped to .wc-home. */

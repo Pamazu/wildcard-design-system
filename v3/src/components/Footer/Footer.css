@@ -1,0 +1,307 @@
+/* Footer.module.css — extracted from components-canonical.css (footer section).
+ *
+ * Wrapped in :global so class names stay un-mangled — JSX inherits its
+ * v1 className strings unchanged. New rules added outside :global gain
+ * scoped (hashed) class names.
+ */
+
+/* ============================================================
+   FROM components-footer.html
+   ============================================================ */
+
+/* =========================================================================
+   FOOTER — Wildcard
+
+   Built on the shared `.wc-bgline` component, mirrored variant (wave at
+   top, black below). Real brand-icon tiles for everything; no invented
+   silhouettes. The icon strip runs EDGE-TO-EDGE of the viewport with a
+   triple-stair Y rhythm (1 low, 2 higher, 3 highest, repeat). The foot
+   block is a 4-column grid: brand · Discover · Locations · margarita.
+   Copyright + credit sit LEFT-aligned just below the Reserve CTA in the
+   brand column.
+   ========================================================================= */
+
+/* Fix: was `html, .footer { ... }` — the compound selector accidentally
+ * applied footer padding + `overflow: hidden` to the entire <html> element,
+ * which (a) horizontally squeezed every page section by 160px on mobile
+ * and (b) blocked vertical scroll on the entire page. The intent was
+ * footer-only chrome; the html clause was a typo. */
+.footer {
+  --footer-pad-x: 80px;
+  padding-right: var(--footer-pad-x);
+  padding-bottom: 40px;
+  padding-left: var(--footer-pad-x);
+  overflow: hidden;                /* clips margarita at footer bottom    */
+  /* Wave positioning handled by shared bg-line.css .wc-bgline--flip */
+}
+
+/* ── Headline + CTA ───────────────────────────────────────────────── */
+.footer-hero {
+  position: relative;
+  z-index: 2;
+  max-width: 880px;
+  margin: 32px auto 0;
+  text-align: center;
+}
+.footer-hero h2 {
+  font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
+  font-weight: 500;
+  font-size: clamp(48px, 6vw, 80px);
+  line-height: 1.05;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  margin: 0 0 18px;
+  color: var(--wc-white);
+}
+.footer-hero h2 .line { display: block; }
+.footer-hero h2 .deco {
+  display: inline-flex;
+  gap: 0.015em;
+  vertical-align: baseline;
+}
+.footer-hero h2 .deco span {
+  display: inline-block;
+  line-height: 1;
+}
+.footer-hero h2 .deco span:nth-child(odd)  { transform: translateY(-6px); }
+.footer-hero h2 .deco span:nth-child(even) { transform: translateY( 4px); }
+.footer-hero h2 .deco span:nth-child(5n+1) { color: var(--wc-yellow); }
+.footer-hero h2 .deco span:nth-child(5n+2) { color: var(--wc-blue);   }
+.footer-hero h2 .deco span:nth-child(5n+3) { color: var(--wc-red);    }
+.footer-hero h2 .deco span:nth-child(5n+4) { color: var(--wc-purple); }
+.footer-hero h2 .deco span:nth-child(5n+5) { color: var(--wc-green);  }
+
+.footer-hero .strap {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.01em;
+  color: var(--wc-white);
+  margin: 0 auto 14px;
+  max-width: 720px;
+}
+.footer-hero p {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(249,240,237,0.85);
+  margin: 0 auto 32px;
+  max-width: 640px;
+  text-wrap: pretty;
+}
+/* ── Icon strip: EDGE-TO-EDGE with triple-stair Y rhythm ─────────── *
+ * Breaks out of the footer's horizontal padding with width:100vw /   *
+ * margin-left:50% transform centering. Default tiles are big (108px) *
+ * with small gaps so they reach edge-to-edge on typical viewports.   *
+ *                                                                     *
+ * Triple stair: pattern repeats every 3 tiles —                       *
+ *   index%3 == 0 → +amp   (lower)                                     *
+ *   index%3 == 1 → 0      (higher)                                    *
+ *   index%3 == 2 → -amp   (even higher)                               *
+ * Then restart at +amp.                                                */
+.footer-icons {
+  position: relative;
+  z-index: 2;
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  padding: 0;
+  --icon-size:   var(--footer-icon-size, 108px);
+  --icon-gap:    var(--footer-icon-gap, 10px);
+  --icon-amp:    var(--footer-icon-amp, 18px);
+  margin-top: 80px;
+  margin-bottom: 96px;
+  display: flex;
+  /* Center so the same tile lands at viewport center regardless of how    *
+   * many tiles overflow on either side. Combined with a row wider than   *
+   * 100vw, the ends spill past both viewport edges.                      */
+  justify-content: center;
+  align-items: center;
+  gap: var(--icon-gap);
+  overflow: visible;
+  flex-wrap: nowrap;
+}
+.footer-icons .tile {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  display: block;
+  flex: none;
+}
+.footer-icons .tile svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.footer-icons .tile:nth-child(3n+1) { transform: translateY( var(--icon-amp)); }
+.footer-icons .tile:nth-child(3n+2) { transform: translateY( 0); }
+.footer-icons .tile:nth-child(3n+3) { transform: translateY(-1 * var(--icon-amp)); }
+/* Explicit value cycle (Safari: calc unary minus oddities) */
+.footer-icons .tile:nth-child(3n+3) { transform: translateY(calc(-1 * var(--icon-amp))); }
+
+/* ── Foot block: horizontal flex — brand · links · margarita ─────── *
+ * clip-path on .footer handles clipping. No overflow rules needed.    */
+.footer-foot {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--foot-brand-gap, 80px);
+}
+
+/* Brand column */
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  flex: 0 0 auto;
+  max-width: 340px;
+}
+.footer-brand #wc-logo-slot { width: var(--footer-logo-w, 320px); }
+.footer-brand svg, .footer-brand img { display: block; width: 100%; height: auto; }
+.footer-brand .strap2 {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.45;
+  color: rgba(249,240,237,0.92);
+  margin: 0;
+  max-width: 340px;
+}
+/* footer-brand button uses shared .btn .btn-red */
+
+.footer-brand .meta {
+  margin-top: var(--footer-meta-top, 20px);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(249,240,237,0.82);
+  display: flex;
+  flex-direction: column;
+  gap: var(--footer-meta-gap, 16px);  /* breathing room between lines  */
+}
+
+/* Discover + Locations live in a sibling flex — own internal gap        *
+ * (controllable) so we can cluster them tight while keeping more room   *
+ * between the brand col and the links group as a whole.                  */
+.footer-links-group {
+  display: flex;
+  gap: var(--foot-links-gap, 56px);
+  flex: 0 0 auto;
+  min-width: 0;
+}
+.footer-links { min-width: 0; flex: 0 0 auto; width: var(--foot-link-col-w, 150px); }
+.footer-links h4 {
+  font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--wc-white);
+  margin: 0 0 16px;
+}
+.footer-links ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.footer-links a {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(249, 240, 237, 0.90);
+  text-decoration: none;
+  transition: color 200ms;
+}
+.footer-links a:hover { color: var(--wc-yellow); }
+
+/* Margarita — flex child that stretches to text-column height.          *
+ * The absolute image extends below; .footer overflow:hidden clips it    *
+ * at the footer's bottom boundary (more margarita visible than before). */
+.footer-margarita {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--margarita-w, 360px);
+  align-self: stretch;
+}
+.footer-margarita img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────── */
+@media (max-width: 1180px) {
+  .footer { --footer-pad-x: 48px; }
+  .footer-icons { --footer-icon-size: 84px; }
+  .footer-foot { max-width: 860px; gap: 40px; --foot-links-gap: 36px; }
+  .footer-margarita { width: 260px; }
+}
+@media (max-width: 960px) {
+  .footer { --footer-pad-x: 28px; }
+  .footer-icons { --footer-icon-size: 64px; --footer-icon-amp: 12px; }
+  /* Stack vertically on small viewports.                                */
+  .footer-foot { flex-direction: column; gap: 40px; }
+  .footer-margarita {
+    align-self: auto;
+    overflow: visible;             /* show full image on mobile          */
+    width: 100%;
+    max-width: 360px;
+  }
+  .footer-margarita img {
+    position: static;              /* back in flow — contributes height  */
+  }
+  .footer-links-group { gap: 28px; }
+}
+@media (max-width: 560px) {
+  .footer-icons { --footer-icon-size: 48px; --footer-icon-amp: 8px; --footer-icon-gap: 6px; }
+}
+
+/* Phone — stack Discover + Locations vertically so the deco WAITING
+ * headline and the links group both fit in a 320 viewport without
+ * overflowing horizontally. */
+@media (max-width: 480px) {
+  .footer { --footer-pad-x: 20px; }
+  .footer-hero h2 { font-size: clamp(32px, 9vw, 48px); }
+  .footer-links-group { flex-direction: column; gap: 24px; }
+  .footer-links { width: 100%; }
+}
+
+/* Tweaks mount */
+#tweaks-root { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+#tweaks-root > * { pointer-events: auto; }
+
+.cls-1 {
+        fill: #f2aa54;
+      }
+
+      .cls-2 {
+        fill: #bb95ba;
+      }
+
+      .cls-3 {
+        fill: #4e8abe;
+      }
+
+      .cls-4 {
+        fill: #ed5a35;
+      }
+
+      .cls-5 {
+        fill: #f8eeeb;
+      }
+

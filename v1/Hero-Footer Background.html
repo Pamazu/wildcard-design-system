@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Wildcard - Hero / Footer Background</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="colors_and_type.css" />
+<link rel="stylesheet" href="bg-line.css" />
+<style>
+  :root { color-scheme: light; }
+
+  html, body {
+    margin: 0;
+    background: var(--bg-page);
+    color: var(--fg-1);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* =========================================================================
+     wc-bgline lives in bg-line.css. The Tweaks panel below writes runtime
+     overrides onto each .wc-bgline / .wc-bgline__ink element directly, so
+     this page can fine-tune the curve, stroke, and layout vars.
+     ========================================================================= */
+
+  /* Tweaks mounting point */
+  #tweaks-root { position: fixed; inset: 0; pointer-events: none; }
+  #tweaks-root > * { pointer-events: auto; }
+
+  /* =========================================================================
+     Demo chrome — not part of the component
+     ========================================================================= */
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 56px 32px 96px;
+  }
+  .page > header { margin-bottom: 32px; }
+  .page > header h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 40px;
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    margin: 0 0 8px;
+    color: var(--fg-1);
+  }
+  .page > header p {
+    font-family: var(--font-body);
+    color: var(--fg-2);
+    margin: 0;
+    max-width: 60ch;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .demo-label {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg-3);
+    margin: 56px 0 16px;
+    font-family: var(--font-mono, ui-monospace, monospace);
+  }
+
+  /* ── Empty demo body so the section has visible height ──────────── */
+  .wc-bgline__demo-body {
+    position: relative;
+    z-index: 1;
+    height: 420px;
+  }
+
+  /* ── Reference card ──────────────────────────────────────────────── */
+  .spec {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    border: 1px solid var(--wc-line);
+    border-radius: 14px;
+    padding: 22px;
+    background: var(--bg-card, #fff);
+    margin-top: 32px;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--fg-2);
+  }
+  .spec h4 {
+    font-family: var(--font-body);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--fg-3);
+    margin: 0 0 8px;
+  }
+  .spec pre { margin: 0; white-space: pre-wrap; color: var(--fg-1); }
+</style>
+</head>
+<body>
+
+  <main class="page">
+    <header>
+      <h1>Background + line</h1>
+      <p>
+        Just the background — black ink masked to a single S-curve, with the
+        yellow line riding the same bezier. Nothing else lives in this
+        component; hero / footer modules layer their own content on top.
+      </p>
+    </header>
+
+    <span class="demo-label">Hero variant · wave at bottom</span>
+
+    <section class="wc-bgline" data-screen-label="01 Hero bg">
+      <div class="wc-bgline__ink wc-grain" aria-hidden="true"></div>
+
+      <div class="wc-bgline__demo-body" aria-hidden="true"></div>
+
+      <!-- Yellow ribbon. Single cubic bezier; preserveAspectRatio="none"
+           lets it stretch with the viewport while keeping a fixed pixel
+           height. The path d is rewritten by the Tweaks panel. -->
+      <svg class="wc-bgline__stroke"
+           viewBox="0 0 1440 300"
+           preserveAspectRatio="none"
+           aria-hidden="true">
+        <path d="M 0 200 C 360 443, 1080 -44, 1440 200" />
+      </svg>
+    </section>
+
+    <div class="spec">
+      <div>
+        <h4>Hero</h4>
+<pre>&lt;section class="wc-bgline"&gt;
+  &lt;div class="wc-bgline__ink wc-grain"&gt;&lt;/div&gt;
+  &lt;!-- content --&gt;
+  &lt;svg class="wc-bgline__stroke"&gt;…&lt;/svg&gt;
+&lt;/section&gt;</pre>
+      </div>
+      <div>
+        <h4>Footer (mirrored)</h4>
+<pre>&lt;section class="wc-bgline wc-bgline--flip"&gt;
+  &lt;div class="wc-bgline__ink wc-grain"&gt;&lt;/div&gt;
+  &lt;svg class="wc-bgline__stroke"&gt;…&lt;/svg&gt;
+  &lt;!-- content --&gt;
+&lt;/section&gt;</pre>
+      </div>
+    </div>
+
+    <span class="demo-label">Footer variant · wave at top (mirrored)</span>
+
+    <section class="wc-bgline wc-bgline--flip" data-screen-label="02 Footer bg">
+      <div class="wc-bgline__ink wc-grain" aria-hidden="true"></div>
+
+      <svg class="wc-bgline__stroke"
+           viewBox="0 0 1440 300"
+           preserveAspectRatio="none"
+           aria-hidden="true">
+        <path d="M 0 200 C 360 443, 1080 -44, 1440 200" />
+      </svg>
+
+      <div class="wc-bgline__demo-body" aria-hidden="true"></div>
+    </section>
+
+  </main>
+
+  <div id="tweaks-root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+
+  <script type="text/babel">
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "ax1": -40,
+      "ay1": 146,
+      "cp1x": 701,
+      "cp1y": 604,
+      "cp2x": 863,
+      "cp2y": -235,
+      "ax2": 1485,
+      "ay2": 305,
+      "strokeW": 130,
+      "bleed": 1,
+      "waveH": 154,
+      "overhang": 72
+    }/*EDITMODE-END*/;
+
+    function HeroFooterTweaks() {
+      const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+      /* ── Derived curves ──────────────────────────────────────────── *
+       * Single source-of-truth bezier. The stroke runs along it. The   *
+       * black-ink edge follows the same bezier, shifted up by half the *
+       * stroke width minus `bleed` — so the ink lands flush with the   *
+       * top of the yellow line at any thickness. `bleed` (default 1)   *
+       * is a tiny extra overlap into the stroke so anti-aliasing can't *
+       * leave a hairline gap.                                           */
+      const strokeD = `M ${t.ax1} ${t.ay1} C ${t.cp1x} ${t.cp1y}, ${t.cp2x} ${t.cp2y}, ${t.ax2} ${t.ay2}`;
+      const off = t.strokeW / 2 - t.bleed;
+      const maskD =
+        `M 0 0 L 1440 0 L ${t.ax2} ${t.ay2 - off} ` +
+        `C ${t.cp2x} ${t.cp2y - off}, ${t.cp1x} ${t.cp1y - off}, ${t.ax1} ${t.ay1 - off} Z`;
+
+      const maskUrl =
+        `url("data:image/svg+xml;utf8,` +
+        `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 300' preserveAspectRatio='none'>` +
+        `<path fill='black' d='${maskD}'/></svg>")`;
+
+      React.useEffect(() => {
+        /* Vars are declared on .wc-bgline / .wc-bgline__ink directly, so a *
+         * root-level override loses to the local definition. Write them   *
+         * onto every instance instead so updates actually take effect.    */
+        document.querySelectorAll('.wc-bgline').forEach((el) => {
+          el.style.setProperty('--wc-bgline-stroke-w', t.strokeW);
+          el.style.setProperty('--wc-bgline-wave-h', `${t.waveH}px`);
+          el.style.setProperty('--wc-bgline-overhang', `${t.overhang}px`);
+        });
+        document.querySelectorAll('.wc-bgline__ink').forEach((el) => {
+          el.style.setProperty('--wc-bgline-mask', maskUrl);
+        });
+        document.querySelectorAll('.wc-bgline__stroke path')
+          .forEach((p) => p.setAttribute('d', strokeD));
+      }, [t, strokeD, maskUrl]);
+
+      /* ── Live mini-preview of the curve ──────────────────────────── */
+      const Preview = () => (
+        <svg viewBox="-20 -20 1480 340" preserveAspectRatio="xMidYMid meet"
+             style={{ width: '100%', height: 64, background: '#1b1a17',
+                      borderRadius: 6, display: 'block' }}>
+          <path d={`M 0 0 L 1440 0 L 1440 ${t.ay2 - off} C ${t.cp2x} ${t.cp2y - off}, ${t.cp1x} ${t.cp1y - off}, ${t.ax1} ${t.ay1 - off} Z`}
+                fill="#1b1a17" stroke="#3a3a37" strokeWidth="2" />
+          <path d={strokeD} fill="none" stroke="#F5AC53" strokeWidth={t.strokeW} />
+          {/* Anchor + control point overlays */}
+          <g stroke="#7BB0FF" strokeWidth="3" fill="none" opacity="0.7">
+            <line x1={t.ax1} y1={t.ay1} x2={t.cp1x} y2={t.cp1y} />
+            <line x1={t.ax2} y1={t.ay2} x2={t.cp2x} y2={t.cp2y} />
+          </g>
+          <g fill="#7BB0FF">
+            <circle cx={t.cp1x} cy={t.cp1y} r="12" />
+            <circle cx={t.cp2x} cy={t.cp2y} r="12" />
+          </g>
+          <g fill="#FFF">
+            <circle cx={t.ax1} cy={t.ay1} r="14" />
+            <circle cx={t.ax2} cy={t.ay2} r="14" />
+          </g>
+        </svg>
+      );
+
+      return (
+        <TweaksPanel title="Tweaks · bg-line">
+          <TweakSection label="Curve preview" />
+          <Preview />
+
+          <TweakSection label="Left anchor" />
+          <TweakSlider label="x" value={t.ax1} min={-200} max={400} step={1}
+                       onChange={(v) => setTweak('ax1', v)} />
+          <TweakSlider label="y" value={t.ay1} min={-100} max={400} step={1}
+                       onChange={(v) => setTweak('ay1', v)} />
+
+          <TweakSection label="Control 1" />
+          <TweakSlider label="x" value={t.cp1x} min={-200} max={1640} step={1}
+                       onChange={(v) => setTweak('cp1x', v)} />
+          <TweakSlider label="y" value={t.cp1y} min={-400} max={700} step={1}
+                       onChange={(v) => setTweak('cp1y', v)} />
+
+          <TweakSection label="Control 2" />
+          <TweakSlider label="x" value={t.cp2x} min={-200} max={1640} step={1}
+                       onChange={(v) => setTweak('cp2x', v)} />
+          <TweakSlider label="y" value={t.cp2y} min={-400} max={700} step={1}
+                       onChange={(v) => setTweak('cp2y', v)} />
+
+          <TweakSection label="Right anchor" />
+          <TweakSlider label="x" value={t.ax2} min={1040} max={1640} step={1}
+                       onChange={(v) => setTweak('ax2', v)} />
+          <TweakSlider label="y" value={t.ay2} min={-100} max={400} step={1}
+                       onChange={(v) => setTweak('ay2', v)} />
+
+          <TweakSection label="Stroke" />
+          <TweakSlider label="Thickness" value={t.strokeW} min={6} max={140} step={1} unit="u"
+                       onChange={(v) => setTweak('strokeW', v)} />
+          <TweakSlider label="Bleed (ink ↔ stroke overlap)" value={t.bleed}
+                       min={-20} max={20} step={1} unit="u"
+                       onChange={(v) => setTweak('bleed', v)} />
+
+          <TweakSection label="Layout" />
+          <TweakSlider label="Wave band height" value={t.waveH}
+                       min={80} max={420} step={2} unit="px"
+                       onChange={(v) => setTweak('waveH', v)} />
+          <TweakSlider label="Overhang (overlap below)" value={t.overhang}
+                       min={0} max={120} step={1} unit="px"
+                       onChange={(v) => setTweak('overhang', v)} />
+        </TweaksPanel>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('tweaks-root'))
+      .render(<HeroFooterTweaks />);
+  </script>
+
+</body>
+</html>

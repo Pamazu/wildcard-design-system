@@ -1,0 +1,106 @@
+/* Testimonials — RESIDUAL only (#36 6/6).
+ * Card type/spacing (.fe-card box/h3/stars/p/author + .testimonials padding)
+ * → Tailwind utilities on Testimonials.jsx + trimmed from pages-home.css.
+ * This file keeps ONLY the carousel MECHANISM + sprocket-teeth decoration
+ * (residual/behavioral), wrapped in :global so class names stay un-mangled.
+ *
+ * #13: the ≤860 carousel behavior (v3 JS-arrows vs v1 native scroll-snap) is
+ * caller-pending — unchanged/HELD.
+ */
+
+/* ── Slider mechanism ─────────────────────────────────────────────── */
+.fe-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Track holds all cards side-by-side; transform shifts them (JS-driven).
+   padding 24px 0 = breathing room so sprocket notches don't bleed. */
+.fe-track {
+  --fe-card-w: 540px;
+  --fe-card-gap: 70px;
+  display: flex;
+  align-items: stretch;
+  gap: var(--fe-card-gap);
+  padding: 24px 0;
+  transition: transform 360ms cubic-bezier(.22, 1, .36, 1);
+  will-change: transform;
+}
+
+/* Card — RESIDUAL props only (carousel width var + teeth vars + abs-anchor).
+   Intrinsic bg/color/padding/flex-col/gap/text-align → utilities on .fe-card. */
+.fe-card {
+  position: relative;
+  flex: none;
+  width: var(--fe-card-w, 540px);
+  --fe-teeth: 6;          /* number of notches (cream rectangles)          */
+  --fe-tooth-w: 75px;     /* notch width — wide rectangles, narrow teeth  */
+  --fe-tooth-h: 22px;     /* notch depth (vertical)                       */
+}
+
+/* Sprocket / film-strip cutouts top + bottom (decoration). Rim color + grain
+   MATCH the page body so the notches blend; mask clips to inter-tooth regions. */
+.fe-card::before,
+.fe-card::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: var(--fe-tooth-h);
+  background-color: var(--wc-cream-soft);
+  background-image: url('/assets/grain-texture-page.png');
+  background-repeat: repeat;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0 var(--fe-tooth-w),
+    #000 var(--fe-tooth-w) 100%
+  );
+          mask-image: linear-gradient(
+    to right,
+    transparent 0 var(--fe-tooth-w),
+    #000 var(--fe-tooth-w) 100%
+  );
+  -webkit-mask-size: calc((100% - var(--fe-tooth-w)) / (var(--fe-teeth) - 1)) 100%;
+          mask-size: calc((100% - var(--fe-tooth-w)) / (var(--fe-teeth) - 1)) 100%;
+  -webkit-mask-repeat: repeat-x;
+          mask-repeat: repeat-x;
+  pointer-events: none;
+}
+.fe-card::after  { bottom: 0; }
+.fe-card::before { top: 0; }
+
+/* Star svg sizing (internal to BrandIcon — not utility-addressable). */
+.fe-stars .star svg { width: 100%; height: 100%; display: block; }
+
+/* ── Slider arrows (functional carousel nav) ─────────────────────── */
+.fe-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 64px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--wc-red);
+  color: var(--wc-white);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  transition: transform 200ms, background-color 200ms;
+  box-shadow: 0 8px 20px -8px rgba(0,0,0,0.35);
+}
+.fe-arrow:hover {
+  background-color: var(--wc-red-deep);
+}
+.fe-arrow:active { transform: translateY(-50%) scale(0.96); }
+.fe-arrow:focus-visible { outline: 2px solid var(--wc-ink); outline-offset: 3px; }
+.fe-arrow svg { width: 20px; height: 32px; display: block; }
+
+.fe-arrow-prev, .fe-arrow-next { /* positioned by JS render() */ }
+
+.fe-arrow[disabled] { opacity: 0.4; pointer-events: none; }
+
+/* Tweaks mount */
+#tweaks-root { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+#tweaks-root > * { pointer-events: auto; }
