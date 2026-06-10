@@ -64,8 +64,8 @@
   .try-it svg { width: 15px; height: 15px; flex: none; color: var(--wc-yellow); }
   /* Scroll hints — subtle bobbing arrows (Bootstrap Icons chevrons).
      Gated on the reduced-motion body class like every other animation. */
-  .scroll-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(253, 243, 241, 0.55); }
-  .scroll-hint svg { width: 22px; height: 22px; display: block; }
+  .scroll-hint { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); color: var(--wc-yellow); }
+  .scroll-hint svg { width: 30px; height: 30px; display: block; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5)); }
   .scroll-up-hint { display: flex; flex-direction: column; align-items: center; gap: 10px; color: rgba(253, 243, 241, 0.6); }
   .scroll-up-hint svg { width: 22px; height: 22px; }
   @keyframes wc-bob-down { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
@@ -154,12 +154,12 @@
      Delete this whole block (and its CSS) for production; the animation
      itself never depends on it. -->
 <div class="demo-tweaks">
-  <label for="speedRange">Speed <span id="speedVal">&times;1.00</span></label>
-  <input type="range" id="speedRange" min="0" max="2.5" step="0.05" value="1" aria-label="Icon movement speed multiplier">
-  <label for="easeRange" style="margin-top:12px">Easing <span id="easeVal">67%</span></label>
-  <input type="range" id="easeRange" min="0" max="1" step="0.01" value="0.67" aria-label="Ease-in-and-out amount">
-  <label for="ptrRange" style="margin-top:12px">Mouse pull <span id="ptrVal">0.90</span></label>
-  <input type="range" id="ptrRange" min="0" max="3" step="0.05" value="0.9" aria-label="Cursor repel strength">
+  <label for="speedRange">Speed <span id="speedVal">&times;0.60</span></label>
+  <input type="range" id="speedRange" min="0" max="1.2" step="0.02" value="0.6" aria-label="Icon movement speed multiplier">
+  <label for="easeRange" style="margin-top:12px">Easing <span id="easeVal">9%</span></label>
+  <input type="range" id="easeRange" min="0" max="0.18" step="0.005" value="0.09" aria-label="Ease-in-and-out amount">
+  <label for="ptrRange" style="margin-top:12px">Mouse pull <span id="ptrVal">0.35</span></label>
+  <input type="range" id="ptrRange" min="0" max="0.7" step="0.01" value="0.35" aria-label="Cursor repel strength">
   <small>Speed: 0 freezes the tiles. Easing: higher = silkier speed changes. Mouse pull: how strongly tiles dodge the cursor.</small>
 </div>
 <script>

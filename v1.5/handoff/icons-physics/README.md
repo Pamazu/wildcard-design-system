@@ -55,8 +55,9 @@ and the actual speed lerps toward that moving target every frame
 
 ### Live controls
 
-- Before load: `window.WC_ICON_PHYSICS = { speed: 1, easing: 0.67, pointer: 0.9 }`
-  - `speed` — 0 = freeze (tiles ease home), 1 = default, up to ~2.5 lively
+- Before load: `window.WC_ICON_PHYSICS = { speed: 0.6, easing: 0.09, pointer: 0.35 }`
+  (those values ARE the shipped defaults — the signed-off feel)
+  - `speed` — 0 = freeze (tiles ease home), higher = faster
   - `easing` — 0..1: 0 = crisp speed changes, 1 = silkiest ease-in-and-out
   - `pointer` — cursor repel strength: 0 = ignore the mouse
 - Live: `window.__wcIconPhysics.setSpeed(x)` / `.setEasing(x)` /

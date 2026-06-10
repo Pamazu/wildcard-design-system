@@ -87,13 +87,14 @@
          window.WC_ICON_PHYSICS = { speed: 1.5, easing: 0.67, pointer: 0.9 }
        or retune live via window.__wcIconPhysics.setSpeed / setEasing /
        setPointerStrength.
-       - speed:   0 = freeze (tiles ease home) · 1 = default · >1 faster
+       - speed:   0 = freeze (tiles ease home) · 0.6 = default · higher = faster
        - easing:  0..1 — 0 = crisp speed changes, 1 = silkiest ease-in/out
-       - pointer: cursor repel strength — 0 = ignore the mouse, 0.9 = default */
+       - pointer: cursor repel strength — 0 = ignore the mouse, 0.35 = default
+       Defaults = the caller-locked feel (speed 0.6 / easing 0.09 / pointer 0.35). */
     var cfg = window.WC_ICON_PHYSICS || {};
-    var speedMul = (typeof cfg.speed === 'number') ? cfg.speed : 1;
-    var ptrStr   = (typeof cfg.pointer === 'number') ? cfg.pointer : 0.9;   // default = the shipped PTR strength
-    var easeAmt  = (typeof cfg.easing === 'number') ? cfg.easing : 0.67;
+    var speedMul = (typeof cfg.speed === 'number') ? cfg.speed : 0.6;
+    var ptrStr   = (typeof cfg.pointer === 'number') ? cfg.pointer : 0.35;
+    var easeAmt  = (typeof cfg.easing === 'number') ? cfg.easing : 0.09;
     var easeVal  = 0.035;                 // per-frame lerp — recomputed from easeAmt below
     function applyEasing() {
       // 0 → 0.30 (near-immediate) … 1 → 0.012 (ultra smooth), exponential map.
