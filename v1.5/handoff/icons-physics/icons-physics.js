@@ -71,10 +71,25 @@
     /* Tuning — gentle table-top drift. All values in local px / px-per-frame
        at 60fps. These are the knobs to play with. */
     var MARGIN     = 34;     // play-area padding beyond the tile lattice — drift room + keeps tiles off the edges/heading
-    var MIN_SPEED  = 0.15;   // never fully stops → always-moving ambient
-    var MAX_SPEED  = 0.50;   // gentle ceiling → never aggressive
+    var MIN_SPEED  = 0.15;   // breathing floor → always-moving ambient
+    var MAX_SPEED  = 0.50;   // breathing ceiling → never aggressive
     var WANDER     = 0.016;  // per-frame random steering magnitude
     var HOME_PULL  = 0.002;  // very soft spring toward each tile's home — keeps the cluster cohesive. Set 0 for free-floating pieces.
+
+    /* Easing — each tile's speed BREATHES along a slow sine between
+       MIN_SPEED and MAX_SPEED (sine = ease-in-and-out by construction:
+       it accelerates and decelerates smoothly, never jumps), and the
+       actual speed LERPS toward that moving target every frame. */
+    var SPEED_EASE     = 0.035;  // per-frame lerp toward the breathing target — lower = silkier
+    var BREATHE_MIN_HZ = 0.05;   // slowest per-tile breathing cycle (~20s)
+    var BREATHE_MAX_HZ = 0.11;   // fastest per-tile breathing cycle (~9s)
+
+    /* Live-tunable speed multiplier — 0 = freeze (tiles ease home), 1 =
+       default, >1 = faster. Configure before load:
+         window.WC_ICON_PHYSICS = { speed: 1.5 }
+       or retune live: window.__wcIconPhysics.setSpeed(1.5). */
+    var cfg = window.WC_ICON_PHYSICS || {};
+    var speedMul = (typeof cfg.speed === 'number') ? cfg.speed : 1;
 
     /* Input-nudge layer (on top of the ambient drift) — all gentle. */
     var PTR_RADIUS   = 220;   // cursor influence radius (local px)
@@ -109,7 +124,11 @@
         var a = (i / tiles.length) * Math.PI * 2 + 0.7;        // spread initial headings
         var sp = (MIN_SPEED + MAX_SPEED) / 2;
         return { tile: t, x: cx, y: cy, restX: cx, restY: cy,
-                 vx: Math.cos(a) * sp, vy: Math.sin(a) * sp };
+                 vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+                 // per-tile breathing oscillator (random phase + rate →
+                 // tiles never speed up / slow down in sync)
+                 breatheHz: BREATHE_MIN_HZ + Math.random() * (BREATHE_MAX_HZ - BREATHE_MIN_HZ),
+                 breathePhase: Math.random() * Math.PI * 2 };
       });
       return true;
     }
@@ -199,15 +218,16 @@
 
       var minX = bounds.minX + HALF, maxX = bounds.maxX - HALF;
       var minY = bounds.minY + HALF, maxY = bounds.maxY - HALF;
+      var now = performance.now() / 1000;
 
       /* Integrate: ambient (wander + soft home-pull) + input nudges
-         + wall bounce + speed clamp (ceiling raised while an input is
-         active, so nudges read but stay gentle). */
-      var maxNow = anyInput() ? MAX_NUDGE : MAX_SPEED;
+         + wall bounce + EASED speed control (ceiling raised while an
+         input is active, so nudges read but stay gentle). */
+      var maxNow = (anyInput() ? MAX_NUDGE : MAX_SPEED) * speedMul;
       for (var i = 0; i < bodies.length; i++) {
         var b = bodies[i];
-        b.vx += (Math.random() * 2 - 1) * WANDER - HOME_PULL * (b.x - b.restX);
-        b.vy += (Math.random() * 2 - 1) * WANDER - HOME_PULL * (b.y - b.restY);
+        b.vx += (Math.random() * 2 - 1) * WANDER * speedMul - HOME_PULL * (b.x - b.restX);
+        b.vy += (Math.random() * 2 - 1) * WANDER * speedMul - HOME_PULL * (b.y - b.restY);
         for (var s = 0; s < forceSources.length; s++) {
           var f = forceSources[s](b);
           if (f) { b.vx += f.fx; b.vy += f.fy; }
@@ -217,9 +237,18 @@
         else if (b.x > maxX) { b.x = maxX; b.vx = -Math.abs(b.vx); }
         if (b.y < minY) { b.y = minY; b.vy = Math.abs(b.vy); }
         else if (b.y > maxY) { b.y = maxY; b.vy = -Math.abs(b.vy); }
-        var sp = Math.hypot(b.vx, b.vy) || 1;
-        var cl = sp < MIN_SPEED ? MIN_SPEED : (sp > maxNow ? maxNow : sp);
-        if (cl !== sp) { b.vx = b.vx / sp * cl; b.vy = b.vy / sp * cl; }
+
+        /* Eased speed control — no hard clamp. The tile's speed lerps
+           toward its sinusoidal breathing target (ease-in-and-out), or
+           back down to the ceiling after an input nudge. Every speed
+           change is gradual; direction is preserved. */
+        var tphase = now * 6.28318 * b.breatheHz + b.breathePhase;
+        var target = (MIN_SPEED + (MAX_SPEED - MIN_SPEED) * (0.5 + 0.5 * Math.sin(tphase))) * speedMul;
+        var sp = Math.hypot(b.vx, b.vy) || 0.0001;
+        var goal = sp > maxNow ? maxNow : target;
+        var ease = sp > maxNow ? 0.15 : SPEED_EASE;   // settle back from nudges a touch quicker
+        var eased = sp + (goal - sp) * ease;
+        b.vx = b.vx / sp * eased; b.vy = b.vy / sp * eased;
       }
       scroll.impulse *= SCROLL_DECAY;   // decay the scroll nudge back to baseline
 
@@ -253,6 +282,13 @@
       }
     }
     step();
+
+    /* Public hook — lets a host page (or the demo's tweak slider) retune
+       the speed live without touching this file. */
+    window.__wcIconPhysics = {
+      setSpeed: function (x) { speedMul = Math.max(0, +x || 0); },
+      getSpeed: function () { return speedMul; }
+    };
 
     /* Rebuild on resize (tile sizes / cluster layout change at breakpoints). */
     var resizeTimer = null;

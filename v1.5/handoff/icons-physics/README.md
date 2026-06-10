@@ -42,7 +42,24 @@ never blocks clicks.
 
 All knobs sit at the top of `initIconPhysics()` in `icons-physics.js`,
 commented inline: drift speed band (`MIN_SPEED`/`MAX_SPEED`), play-area
-padding (`MARGIN`), cursor radius/strength, scroll and tilt strength.
+padding (`MARGIN`), cursor radius/strength, scroll and tilt strength,
+easing rate (`SPEED_EASE`) and breathing cycle (`BREATHE_*_HZ`).
+
+### Easing
+
+Tile speed is never constant and never jumps: each tile's speed *breathes*
+along its own slow sine wave between `MIN_SPEED` and `MAX_SPEED` (a sine is
+ease-in-and-out by construction — smooth acceleration and deceleration),
+and the actual speed lerps toward that moving target every frame
+(`SPEED_EASE`). Input nudges decay back through the same easing.
+
+### Speed control
+
+- Before load: `window.WC_ICON_PHYSICS = { speed: 1.5 }` (0 = freeze,
+  1 = default).
+- Live: `window.__wcIconPhysics.setSpeed(1.5)` / `.getSpeed()`.
+- The demo page ships a small "Icon speed" slider wired to this hook —
+  it is demo-only chrome; delete its block for production.
 
 ## Performance notes
 
