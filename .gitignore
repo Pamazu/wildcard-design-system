@@ -4,3 +4,4 @@ dist/
 storybook-static/
 *.log
 .DS_Store
+.playwright-cli/
