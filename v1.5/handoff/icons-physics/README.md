@@ -1,5 +1,7 @@
 # Hero icons — ambient physics (standalone, vanilla)
 
+**Live demo:** https://wildcard-icons.web.app
+
 The hero icon-tiles animation from the Wildcard homepage, extracted as a
 self-contained drop-in. **Vanilla JS + HTML + CSS — no React, no libraries,
 no build step.** Open `index.html` directly in a browser to see it run.
@@ -55,7 +57,7 @@ and the actual speed lerps toward that moving target every frame
 
 ### Live controls
 
-- Before load: `window.WC_ICON_PHYSICS = { speed: 0.6, easing: 0.09, pointer: 0.35 }`
+- Before load: `window.WC_ICON_PHYSICS = { speed: 0.86, easing: 0.05, pointer: 0.70 }`
   (those values ARE the shipped defaults — the signed-off feel)
   - `speed` — 0 = freeze (tiles ease home), higher = faster
   - `easing` — 0..1: 0 = crisp speed changes, 1 = silkiest ease-in-and-out
