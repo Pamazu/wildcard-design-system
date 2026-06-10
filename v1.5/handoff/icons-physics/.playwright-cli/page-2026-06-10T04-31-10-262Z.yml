@@ -1,0 +1,22 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - heading "Hero icons — ambient physics" [level=1] [ref=e3]
+    - paragraph [ref=e4]: The tiles drift and collide on their own. Move the cursor near them for a gentle push-aside; scroll the page for an inertial nudge; on a phone, tilt the device.
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+  - generic [ref=e5]: scroll — the tiles pick up a gentle vertical inertia

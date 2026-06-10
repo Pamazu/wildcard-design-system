@@ -1,0 +1,138 @@
+/* =========================================================================
+   wc-bgline  ·  reusable hero / footer background + line
+   -------------------------------------------------------------------------
+   One S-curve — one convex peak, one concave valley. The black surface is
+   masked to the curve so nothing prints below the yellow stroke; the page
+   colour breathes through. Same component, vertically mirrored for footer
+   via `.wc-bgline--flip`.
+
+   USAGE
+   -----
+     <section class="hero wc-bgline">
+       <div class="wc-bgline__ink wc-grain"></div>
+       <!-- hero content -->
+       <svg class="wc-bgline__stroke" viewBox="0 0 1440 300"
+            preserveAspectRatio="none" aria-hidden="true">
+         <path d="M -40 146 C 701 604, 863 -235, 1485 305" />
+       </svg>
+     </section>
+
+     <footer class="footer wc-bgline wc-bgline--flip">…same children…</footer>
+
+   The curve geometry (anchors + control points), stroke thickness, mask
+   bleed, wave-band height, and overhang are all controllable from the
+   Tweaks panel in Hero-Footer Background.html — those values are baked
+   in below as the canonical defaults.
+   ========================================================================= */
+
+.wc-bgline {
+  /* Tunables --------------------------------------------------------- */
+  --wc-bgline-wave-h:     154px;            /* fixed wave-band height   */
+  --wc-bgline-overhang:    72px;            /* yellow extends past edge */
+  --wc-bgline-stroke-bleed: 70px;          /* extra padding for thick stroke overflow */
+  --wc-bgline-fill:        var(--wc-black);
+  --wc-bgline-stroke:      var(--wc-yellow);
+  --wc-bgline-stroke-w:    130;             /* in viewBox user units    */
+
+  /* Canonical bezier (matches the <svg class="wc-bgline__stroke"> path *
+   * in the markup). Edit both together if you tune the curve.         *
+   * The ink mask is the same bezier shifted up by strokeW/2 - bleed   *
+   * then nudged 17 vb-units PAST the stroke top so the ink bleeds     *
+   * several px INTO the yellow ribbon — eliminates the AA gap between *
+   * mask edge and stroke edge on high-DPI displays.                    */
+  --wc-bgline-mask:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 300' preserveAspectRatio='none'><path fill='black' d='M 0 0 L 1440 0 L 1485 275 C 863 -265, 701 574, -40 116 Z'/></svg>");
+
+  position: relative;
+  isolation: isolate;
+  padding-bottom: calc(var(--wc-bgline-wave-h) + var(--wc-bgline-overhang) + var(--wc-bgline-stroke-bleed));
+  margin-bottom: 0;
+}
+
+/* Ink — the black surface, masked to the wave silhouette. The container
+ * itself has no background so the page colour shows through below the
+ * yellow stroke. The ink extends past the container by --overhang so the
+ * masked curve can land in the same pixel range as the yellow stroke. */
+.wc-bgline__ink {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--wc-bgline-fill);
+  z-index: -1;
+  pointer-events: none;
+
+  /* Two mask layers, unioned via the default mask-composite: add        *
+   *   1. solid linear gradient covering all but the wave band           *
+   *   2. inline SVG mask painting the wavy ink silhouette in the band   *
+   * Layer 2's render height stays at (waveH + overhang) so its bezier   *
+   * lands at the same y as the stroke SVG (curves match). Layer 1 is    *
+   * grown 16px DOWNWARD into layer 2's filled area to bury the AA seam  *
+   * where they meet — doesn't shift either curve. 16px covers high-DPI *
+   * rounding at any device-pixel-ratio including 3× retina.            */
+  mask-image:         linear-gradient(#000, #000), var(--wc-bgline-mask);
+  -webkit-mask-image: linear-gradient(#000, #000), var(--wc-bgline-mask);
+  mask-size:
+    100% calc(100% - var(--wc-bgline-wave-h) - var(--wc-bgline-overhang) + 16px),
+    100% calc(var(--wc-bgline-wave-h) + var(--wc-bgline-overhang));
+  -webkit-mask-size:
+    100% calc(100% - var(--wc-bgline-wave-h) - var(--wc-bgline-overhang) + 16px),
+    100% calc(var(--wc-bgline-wave-h) + var(--wc-bgline-overhang));
+  mask-position:         top, 0 calc(100% - var(--wc-bgline-stroke-bleed, 0px));
+  -webkit-mask-position: top, 0 calc(100% - var(--wc-bgline-stroke-bleed, 0px));
+  mask-repeat:           no-repeat;
+  -webkit-mask-repeat:   no-repeat;
+}
+/* wc-grain rides inside __ink, so the speckle gets clipped to the same
+ * mask shape automatically. Re-asserting `position: absolute` because
+ * .wc-grain's defaults assume static flow. */
+.wc-bgline__ink.wc-grain { position: absolute; }
+
+/* Yellow ribbon — overlaid on top of the wave area at the bottom. The
+ * SVG stretches horizontally; its height stays pixel-fixed. viewBox is
+ * 1440×300 and the render box is container-width × (wave-h + overhang),
+ * so vertical scale matches the ink mask exactly — the two share one
+ * source-of-truth bezier. */
+.wc-bgline__stroke {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--wc-bgline-stroke-bleed, 0);
+  width: 100%;
+  height: calc(var(--wc-bgline-wave-h) + var(--wc-bgline-overhang));
+  display: block;
+  pointer-events: none;
+  overflow: visible;
+}
+/* Dark fill above the curve — eliminates any gap between ink mask and
+ * stroke caused by subpixel rendering differences between CSS masks and
+ * SVG paths. Both paths share the same SVG coordinate space = zero gap. */
+.wc-bgline__stroke .ink-fill {
+  fill: var(--wc-bgline-fill);
+  stroke: none;
+}
+.wc-bgline__stroke path {
+  fill: none;
+  stroke: var(--wc-bgline-stroke);
+  stroke-width: var(--wc-bgline-stroke-w);
+}
+
+/* Footer variant: mirror vertically. Black moves to the bottom of the
+ * section, wave sits at the top, yellow stroke overlaps the top border. */
+.wc-bgline--flip {
+  padding-bottom: 0;
+  padding-top: calc(var(--wc-bgline-wave-h) + var(--wc-bgline-overhang) + var(--wc-bgline-stroke-bleed));
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.wc-bgline--flip .wc-bgline__ink {
+  top: 0;
+  bottom: 0;
+  transform: scaleY(-1);
+}
+.wc-bgline--flip .wc-bgline__stroke {
+  top: var(--wc-bgline-stroke-bleed, 0);
+  bottom: auto;
+  transform: scaleY(-1);
+}

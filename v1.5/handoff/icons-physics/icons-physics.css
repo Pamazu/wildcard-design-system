@@ -1,0 +1,44 @@
+/* ============================================================================
+   Wildcard — Hero icons ambient physics — CSS
+   The lattice below is the tiles' REST layout. The JS only ever adds a
+   translate3d() delta on top of it, so this CSS fully owns sizing/placement.
+   ========================================================================== */
+
+/* The icon cluster — a 4-column, 2-row staggered lattice.
+   --tile drives everything (tile size, gaps, stagger steps), so resizing
+   the cluster = changing one variable. The sim reads the live layout, so
+   any size works without touching the JS. */
+.hero-cluster {
+  --tile: 120px;                      /* tile side (the only knob you need) */
+  --gap: 11px;                        /* gap between tiles */
+  --step: calc(var(--tile) * 0.5);    /* vertical stagger between columns */
+  position: relative;
+  width: calc(4 * var(--tile) + 3 * var(--gap));
+  height: calc(2 * var(--tile) + var(--gap) + 2 * var(--step));
+  pointer-events: none;               /* cursor input is read by the parent section */
+}
+
+.hero-cluster .tile {
+  position: absolute;
+  width: var(--tile);
+  height: var(--tile);
+}
+.hero-cluster .tile svg { width: 100%; height: 100%; display: block; }
+
+/* Column lattice — columns 1+4 sit lowest, 3 highest (the v1 hero stagger). */
+.hero-cluster .c1-top    { left: 0; top: calc(2 * var(--step)); }
+.hero-cluster .c1-bottom { left: 0; top: calc(2 * var(--step) + var(--tile) + var(--gap)); }
+.hero-cluster .c2-top    { left: calc(1 * (var(--tile) + var(--gap))); top: calc(1 * var(--step)); }
+.hero-cluster .c2-bottom { left: calc(1 * (var(--tile) + var(--gap))); top: calc(1 * var(--step) + var(--tile) + var(--gap)); }
+.hero-cluster .c3-top    { left: calc(2 * (var(--tile) + var(--gap))); top: 0; }
+.hero-cluster .c3-bottom { left: calc(2 * (var(--tile) + var(--gap))); top: calc(var(--tile) + var(--gap)); }
+.hero-cluster .c4-top    { left: calc(3 * (var(--tile) + var(--gap))); top: calc(2 * var(--step)); }
+.hero-cluster .c4-bottom { left: calc(3 * (var(--tile) + var(--gap))); top: calc(2 * var(--step) + var(--tile) + var(--gap)); }
+
+/* Physics performance — the JS translates each tile every frame, so NO CSS
+   transition here (it would lag the per-frame transforms); will-change keeps
+   the tiles on their own compositor layer for smooth 60fps motion.
+   Gated on the reduced-motion body class the JS maintains. */
+body:not(.wcanim-no-motion) .hero-cluster .tile {
+  will-change: transform;
+}

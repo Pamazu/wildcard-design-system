@@ -1,0 +1,75 @@
+/* Wildcard Button Component — shared across all components.
+   Single source of truth. Edit here, propagates everywhere. */
+
+.btn {
+  --btn-bg: var(--wc-yellow);
+  --btn-bg-hover: var(--wc-yellow-deep);
+  --btn-fg: var(--wc-ink);
+  --btn-shadow: 0 1px 0 rgba(27,26,23,0.04);
+  --btn-shadow-hover: 0 10px 22px -8px rgba(27,26,23,0.28), 0 2px 0 rgba(27,26,23,0.06);
+  --ease-out: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex; align-items: center; gap: 0;
+  font-family: var(--font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  font-size: 18px;
+  line-height: 1;
+  padding: 17px 24px 19px;
+  border-radius: 60px;
+  border: 0;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  cursor: pointer;
+  box-shadow: var(--btn-shadow);
+  text-decoration: none;
+  transition:
+    transform var(--dur-2) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    color var(--dur-2) var(--ease-out);
+}
+.btn:hover {
+  background-color: var(--btn-bg-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-hover);
+}
+.btn:active { transform: translateY(0); transition-duration: 60ms; }
+.btn:focus-visible { outline: 2px solid var(--wc-ink); outline-offset: 3px; }
+
+.btn .btn-label {
+  position: relative; display: inline-block; overflow: hidden;
+  height: 1em;
+}
+.btn .btn-label span {
+  display: block; transition: transform var(--dur-3) var(--ease-out);
+}
+.btn .btn-label span + span {
+  position: absolute; inset: 0; transform: translateY(110%);
+}
+.btn:hover .btn-label span:first-child { transform: translateY(-110%); }
+.btn:hover .btn-label span + span { transform: translateY(0); }
+
+.btn .btn-arrow {
+  display: inline-block; width: 0; opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    width var(--dur-3) var(--ease-out),
+    opacity var(--dur-2) var(--ease-out),
+    transform var(--dur-3) var(--ease-out);
+  overflow: hidden; white-space: nowrap;
+}
+.btn .btn-arrow svg { display: block; width: 18px; height: 18px; }
+.btn:hover .btn-arrow { width: 22px; opacity: 1; transform: translateX(0); margin-left: 10px; }
+
+.btn-yellow { --btn-bg: var(--wc-yellow); --btn-bg-hover: var(--wc-yellow-deep); --btn-fg: var(--wc-ink); }
+.btn-red { --btn-bg: var(--wc-red); --btn-bg-hover: var(--wc-red-deep); --btn-fg: var(--wc-white); }
+
+.btn-sm { font-size: 16px; line-height: 1; padding: 11px 24px 12px; border-radius: 60px; }
+.btn-sm .btn-arrow svg { width: 14px; height: 14px; }
+.btn-sm:hover .btn-arrow { width: 18px; }

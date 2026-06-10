@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wildcard — Hero Icons Ambient Physics (standalone)</title>
+<link rel="stylesheet" href="icons-physics.css">
+<style>
+  /* Demo-page chrome only — NOT part of the animation. Delete freely. */
+  :root { --wc-ink: #1B1A17; --wc-yellow: #F5AC53; --wc-cream: #FFF6E9; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--wc-cream); color: var(--wc-ink); }
+  .hero { min-height: 92vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 48px; background: var(--wc-ink); padding: 64px 24px; }
+  .hero h1 { color: var(--wc-cream); font-size: 28px; font-weight: 600; margin: 0; text-align: center; }
+  .hero p { color: rgba(255, 246, 233, 0.65); font-size: 15px; margin: 0; max-width: 520px; text-align: center; line-height: 1.5; }
+  .spacer { padding: 96px 24px; text-align: center; font-size: 15px; color: rgba(27, 26, 23, 0.55); }
+  .spacer div { height: 60vh; }
+</style>
+</head>
+<body>
+
+<!-- SVG icon symbols (verbatim from the Wildcard design system) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-martini" viewBox="0 0 125 125"><path d="M114.29 0H10.48C4.69 0 0 4.69 0 10.48V114.29C0 120.08 4.69 124.77 10.48 124.77H114.29C120.08 124.77 124.77 120.08 124.77 114.29V10.48C124.77 4.69 120.08 0 114.29 0Z" fill="#F5AC53"></path><path d="M65.02 103.1V53.11L96.48 14.94H28.29L59.75 53.11V103.1C52.13 103.36 46.32 104.74 46.32 106.4C46.32 108.25 53.52 109.75 62.39 109.75C71.26 109.75 78.46 108.25 78.46 106.4C78.46 104.74 72.64 103.36 65.03 103.1H65.02Z" fill="#1B1A17"></path></symbol>
+  <symbol id="i-wine" viewBox="0 0 125 125"><path d="M113.76 0H11.01C4.93 0 0 4.93 0 11.01V113.76C0 119.84 4.93 124.77 11.01 124.77H113.76C119.84 124.77 124.77 119.84 124.77 113.76V11.01C124.77 4.93 119.84 0 113.76 0Z" fill="#F5AC53"></path><path d="M32.57 14.94V24.88C32.57 41.18 44.42 54.92 59.75 56.2V103.1C52.13 103.36 46.32 104.74 46.32 106.4C46.32 108.25 53.52 109.75 62.39 109.75C71.26 109.75 78.46 108.25 78.46 106.4C78.46 104.74 72.64 103.36 65.03 103.1V56.18C80.3 54.79 92.21 41.21 92.21 24.87V14.95H32.59L32.57 14.94Z" fill="#1B1A17"></path></symbol>
+  <symbol id="i-flute" viewBox="0 0 125 125"><path d="M113.95 0H10.82C4.84 0 0 4.84 0 10.82V113.95C0 119.93 4.84 124.77 10.82 124.77H113.95C119.93 124.77 124.77 119.93 124.77 113.95V10.82C124.77 4.84 119.93 0 113.95 0Z" fill="#F5AC53"></path><path d="M65.02 103.14V70.46C69.81 65.82 73.34 48.72 73.34 28.56V14.94H51.42V28.58C51.42 48.68 54.94 65.95 59.74 70.52V103.14C54.61 103.49 50.78 104.81 50.78 106.4C50.78 108.25 55.97 109.75 62.37 109.75C68.77 109.75 73.96 108.25 73.96 106.4C73.96 104.81 70.13 103.48 65 103.14H65.02Z" fill="#1B1A17"></path></symbol>
+  <symbol id="i-meeple" viewBox="0 0 125 125"><path d="M111.29 123.96H13.21C6.14 123.96 0.41 118.23 0.41 111.16V13.08C0.41 6.01 6.14 0.28 13.21 0.28H111.29C118.36 0.28 124.09 6.01 124.09 13.08V111.16C124.09 118.23 118.36 123.96 111.29 123.96Z" fill="#F5AC53"></path><path d="M72.69 102.42L63.58 88.48C63.24 87.97 62.32 87.95 61.89 88.01C61.28 88.1 60.87 88.48 60.49 89.07L51.66 102.78C51.23 103.44 50.87 104.07 50.08 104.42L24.85 104.42C24.01 104.42 23.2 103.72 23.08 102.96C22.92 101.97 23.17 101.05 23.38 100.06C24.4 95.17 26.23 90.58 28.49 86.14L33.68 77.27C35.11 74.93 36.39 72.65 37.58 70.19C38.22 68.88 38.9 67.62 38.97 66.12C39 65.4 38.2 64.74 37.53 64.71L35.24 64.6C31.46 64.42 28.06 64.83 24.22 63C21.76 61.83 20.33 60.15 19.99 57.34C19.7 54.84 20.66 52.47 22.29 50.56L26.7 46.72C31.38 43.42 39.18 40.43 44.76 38.87C45.16 38.76 45.47 38.82 45.89 38.57C46.54 38.18 48.39 38.2 48.47 36.17C48.6 33.03 49.13 29.95 50.51 27.13L53.41 23.1C55.89 20.9 58.13 20.17 60.5 19.92C63.36 19.62 66.46 19.95 68.91 21.46C70.15 22.26 70.86 23.04 71.23 23.34C74.25 25.8 75.48 30.36 75.98 34.22C76.09 35.15 75.93 36.06 76.25 37C76.37 37.37 76.8 37.91 77.21 38.05C79.42 38.8 81.66 39.26 83.82 40.18C88.11 41.59 90.26 42.5 92.36 43.57L98.71 47.37C100.62 48.59 102.25 50.24 103.39 52.2L103.89 53.17C105.22 55.81 104.47 60.12 102.47 61.58C99.65 63.89 95.32 64.5 92.58 64.57L87.12 64.71C86.04 64.74 85.4 65.63 85.61 66.68C85.87 68.05 86.47 69.29 87.09 70.52L94.87 83.91L99.28 93.55C100.37 96.27 101.06 99.07 101.5 101.98C101.68 103.16 101.04 104.4 99.75 104.4L74.91 104.42C73.62 104.42 73.27 103.31 72.69 102.42Z" fill="#1B1A17"></path></symbol>
+  <symbol id="i-heart" viewBox="0 0 125 125"><path d="M114.2 0H10.57C4.73 0 0 4.73 0 10.57V114.2C0 120.04 4.73 124.77 10.57 124.77H114.2C120.04 124.77 124.77 120.04 124.77 114.2V10.57C124.77 4.73 120.04 0 114.2 0Z" fill="#F5AC53"></path><path d="M62.39 104.46L21.08 59.18C9.42 46.4 15.12 25.35 31.88 21.04C39.03 19.2 47.1 20.72 53.7 27.32L62.38 36L71.06 27.32C77.66 20.72 85.73 19.2 92.88 21.04C109.64 25.35 115.34 46.4 103.68 59.18L62.38 104.46H62.39Z" fill="#1B1A17"></path></symbol>
+  <symbol id="i-spade" viewBox="0 0 125 125"><path d="M113.81 0H10.96C4.91 0 0 4.91 0 10.96V113.81C0 119.86 4.91 124.77 10.96 124.77H113.81C119.86 124.77 124.77 119.86 124.77 113.81V10.96C124.77 4.91 119.86 0 113.81 0Z" fill="#F5AC53"></path><path d="M103.69 60.29L62.39 15.01L21.08 60.29C9.42 73.07 15.12 94.12 31.88 98.43C39.03 100.27 47.1 98.75 53.7 92.15L54.67 91.18L51.75 109.75H73.01L70.09 91.18L71.06 92.15C77.66 98.75 85.73 100.27 92.88 98.43C109.64 94.12 115.34 73.07 103.68 60.29H103.69Z" fill="#1B1A17"></path></symbol>
+  <symbol id="i-star" viewBox="0 0 125 125"><path d="M114.2 0H10.57C4.73 0 0 4.73 0 10.57V114.2C0 120.04 4.73 124.77 10.57 124.77H114.2C120.04 124.77 124.77 120.04 124.77 114.2V10.57C124.77 4.73 120.04 0 114.2 0Z" fill="#F5AC53"></path><path d="M109.76 54.88H80.52L101.19 34.2L90.57 23.58L69.9 44.26V15.01H54.88V44.26L34.2 23.58L23.58 34.2L44.26 54.88H15.01V69.9H44.26L23.58 90.57L34.2 101.19L54.88 80.52V109.76H69.9V80.52L90.57 101.19L101.19 90.57L80.52 69.9H109.76V54.88Z" fill="#1B1A17"></path></symbol>
+</svg>
+
+<!-- The section wrapping the cluster doubles as the cursor-input surface
+     (the JS listens on .hero so the cluster keeps pointer-events: none). -->
+<section class="hero">
+  <h1>Hero icons &mdash; ambient physics</h1>
+  <p>The tiles drift and collide on their own. Move the cursor near them for a gentle push-aside; scroll the page for an inertial nudge; on a phone, tilt the device.</p>
+
+  <!-- THE ANIMATION: this block + icons-physics.css + icons-physics.js -->
+  <div class="hero-cluster" aria-hidden="true">
+    <span class="tile c1-top"><svg viewBox="0 0 125 125"><use href="#i-flute"></use></svg></span>
+    <span class="tile c1-bottom"><svg viewBox="0 0 125 125"><use href="#i-heart"></use></svg></span>
+    <span class="tile c2-top"><svg viewBox="0 0 125 125"><use href="#i-martini"></use></svg></span>
+    <span class="tile c2-bottom"><svg viewBox="0 0 125 125"><use href="#i-meeple"></use></svg></span>
+    <span class="tile c3-top"><svg viewBox="0 0 125 125"><use href="#i-star"></use></svg></span>
+    <span class="tile c3-bottom"><svg viewBox="0 0 125 125"><use href="#i-wine"></use></svg></span>
+    <span class="tile c4-top"><svg viewBox="0 0 125 125"><use href="#i-star"></use></svg></span>
+    <span class="tile c4-bottom"><svg viewBox="0 0 125 125"><use href="#i-spade"></use></svg></span>
+  </div>
+</section>
+
+<div class="spacer">
+  scroll &mdash; the tiles pick up a gentle vertical inertia
+  <div></div>
+</div>
+
+<script src="icons-physics.js"></script>
+</body>
+</html>

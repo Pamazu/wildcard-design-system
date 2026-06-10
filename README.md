@@ -1,10 +1,11 @@
 # Wildcard Design System
 
-The Wildcard brand design system, in two implementations:
+The Wildcard brand design system, in three variations:
 
 | | Folder | Stack | Live |
 |---|---|---|---|
-| **v1** | [`v1/`](./v1) | Static HTML + CSS + vanilla JS | https://wildcard-v1.web.app |
+| **v1** | [`v1/`](./v1) | Static HTML + CSS + vanilla JS — frozen reference | https://wildcard-v1.web.app |
+| **v1.5** | [`v1.5/`](./v1.5) | v1 evolved for dev handoff: vanilla-only, per-animation standalone extractions under `v1.5/handoff/` | — |
 | **v3** | [`v3/`](./v3) | React + Vite + Tailwind | https://wildcard-v3.web.app |
 
 Both ship a **dashboard** (component browser): a sidebar of every token, primitive, component, and page, each rendered live in a preview pane.
@@ -48,4 +49,4 @@ Key files: `src/Dashboard.jsx` (the browser UI), `src/HomePage.jsx` (the assembl
 
 ---
 
-*Two implementations of one system — v1 is the original static build; v3 is the React rebuild and the primary deployed target.*
+*Three variations of one system — v1 is the original static build (frozen reference); v1.5 evolves it for developer handoff; v3 is the React rebuild and the primary deployed target.*
