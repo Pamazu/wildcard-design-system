@@ -15,7 +15,10 @@
      ink #1b1a17 · cream #fdf3f1 · yellow #f5ac53. */
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--wc-black); color: var(--wc-white); }
-  .hero { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--wc-black); padding: 48px 24px; }
+  .hero { position: relative; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: var(--wc-black); padding: clamp(40px, 7vh, 72px) 24px 48px; overflow: hidden; }
+  /* Brand texture component (same treatment as v1's dark sections):
+     paper-grain multiply overlay at 0.4. */
+  .hero::before, .spacer::before { content: ''; position: absolute; inset: 0; background: url('../../preview/assets/paper-grain.png') repeat; mix-blend-mode: multiply; opacity: 0.4; pointer-events: none; }
   /* Demo-only: scale the cluster with viewport height so the whole hero
      (heading + lede + tiles) fits the first viewport. The handoff CSS keeps
      its plain 120px default; the sim reads live layout either way. */
@@ -32,18 +35,32 @@
     color: var(--wc-white);
     margin: 0 0 20px;
   }
-  .hero h1 .accent { color: var(--wc-yellow); }
+  .hero h1 .line { display: flex; justify-content: center; align-items: baseline; gap: 0.28em; white-space: nowrap; }
+  /* Canonical Wildcard deco treatment: per-letter up-down stagger + the
+     brand color sequence yellow, blue, red, purple, green. */
+  .deco { display: inline-flex; gap: 0.015em; vertical-align: baseline; }
+  .deco span { display: inline-block; line-height: 1; }
+  .deco span:nth-child(odd)  { transform: translateY(-6px); }
+  .deco span:nth-child(even) { transform: translateY( 4px); }
+  .deco span:nth-child(5n+1) { color: var(--wc-yellow); }
+  .deco span:nth-child(5n+2) { color: var(--wc-blue);   }
+  .deco span:nth-child(5n+3) { color: var(--wc-red);    }
+  .deco span:nth-child(5n+4) { color: var(--wc-purple); }
+  .deco span:nth-child(5n+5) { color: var(--wc-green);  }
   .hero p {
     font-family: var(--font-body);
     font-weight: 500;
-    font-size: 16px;
-    line-height: 1.55;
-    color: rgba(253, 243, 241, 0.68);
+    font-size: 17px;
+    line-height: 1.6;
+    color: rgba(253, 243, 241, 0.72);
     max-width: 52ch;
     text-align: center;
-    margin: 0 0 56px;
+    margin: 0 0 68px;
   }
-  .spacer { background: var(--wc-black); padding: 96px 24px; text-align: center; font-family: var(--font-body); font-size: 14px; color: rgba(253, 243, 241, 0.4); }
+  .spacer { position: relative; background: var(--wc-black); padding: 96px 24px; text-align: center; font-family: var(--font-body); font-size: 14px; color: rgba(253, 243, 241, 0.4); }
+  .try-it { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 52px; }
+  .try-it span { font-family: var(--font-body); font-size: 13px; font-weight: 600; color: rgba(253, 243, 241, 0.78); border: 1px solid rgba(253, 243, 241, 0.22); border-radius: 999px; padding: 9px 18px; }
+  .try-it span b { color: var(--wc-yellow); font-weight: 700; }
   .spacer div { height: 60vh; }
   /* Demo-only tweak panel — design-iteration chrome, NOT part of the handoff. */
   .demo-tweaks { position: fixed; right: 20px; bottom: 20px; z-index: 10; width: 232px; background: rgba(27, 26, 23, 0.92); border: 1px solid rgba(245, 172, 83, 0.35); border-radius: 12px; padding: 16px; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35); }
@@ -69,7 +86,16 @@
 <!-- The section wrapping the cluster doubles as the cursor-input surface
      (the JS listens on .hero so the cluster keeps pointer-events: none). -->
 <section class="hero">
-  <h1>Hero icons<br><span class="accent">in motion</span></h1>
+  <h1>
+    <span class="line">
+      <span class="deco"><span>H</span><span>E</span><span>R</span><span>O</span></span>
+      <span class="plain">ICONS</span>
+    </span>
+    <span class="line">
+      <span class="plain">IN</span>
+      <span class="deco"><span>M</span><span>O</span><span>T</span><span>I</span><span>O</span><span>N</span></span>
+    </span>
+  </h1>
   <p>The tiles drift and collide on their own. Nudge them with the cursor, a scroll, or a tilt of your phone.</p>
 
   <!-- THE ANIMATION: this block + icons-physics.css + icons-physics.js -->
@@ -82,6 +108,13 @@
     <span class="tile c3-bottom"><svg viewBox="0 0 125 125"><use href="#i-wine"></use></svg></span>
     <span class="tile c4-top"><svg viewBox="0 0 125 125"><use href="#i-star"></use></svg></span>
     <span class="tile c4-bottom"><svg viewBox="0 0 125 125"><use href="#i-spade"></use></svg></span>
+  </div>
+
+  <!-- How to test it — explicit interaction hints -->
+  <div class="try-it" aria-hidden="true">
+    <span><b>Glide</b> the cursor through the tiles</span>
+    <span><b>Scroll</b> down, then back up</span>
+    <span><b>Tilt</b> your phone</span>
   </div>
 </section>
 
@@ -96,19 +129,28 @@
      Delete this whole block (and its CSS) for production; the animation
      itself never depends on it. -->
 <div class="demo-tweaks">
-  <label for="speedRange">Icon speed <span id="speedVal">&times;1.00</span></label>
+  <label for="speedRange">Speed <span id="speedVal">&times;1.00</span></label>
   <input type="range" id="speedRange" min="0" max="2.5" step="0.05" value="1" aria-label="Icon movement speed multiplier">
-  <small>0 = freeze, 1 = default, 2.5 = lively</small>
+  <label for="easeRange" style="margin-top:12px">Easing <span id="easeVal">67%</span></label>
+  <input type="range" id="easeRange" min="0" max="1" step="0.01" value="0.67" aria-label="Ease-in-and-out amount">
+  <label for="ptrRange" style="margin-top:12px">Mouse pull <span id="ptrVal">0.90</span></label>
+  <input type="range" id="ptrRange" min="0" max="3" step="0.05" value="0.9" aria-label="Cursor repel strength">
+  <small>Speed: 0 freezes the tiles. Easing: higher = silkier speed changes. Mouse pull: how strongly tiles dodge the cursor.</small>
 </div>
 <script>
 (function () {
-  var range = document.getElementById('speedRange');
-  var label = document.getElementById('speedVal');
-  range.addEventListener('input', function () {
-    var x = parseFloat(range.value);
-    label.textContent = '×' + x.toFixed(2);
-    if (window.__wcIconPhysics) window.__wcIconPhysics.setSpeed(x);
-  });
+  function wire(rangeId, labelId, fmt, apply) {
+    var range = document.getElementById(rangeId);
+    var label = document.getElementById(labelId);
+    range.addEventListener('input', function () {
+      var x = parseFloat(range.value);
+      label.textContent = fmt(x);
+      if (window.__wcIconPhysics) apply(x);
+    });
+  }
+  wire('speedRange', 'speedVal', function (x) { return '×' + x.toFixed(2); }, function (x) { window.__wcIconPhysics.setSpeed(x); });
+  wire('easeRange', 'easeVal', function (x) { return Math.round(x * 100) + '%'; }, function (x) { window.__wcIconPhysics.setEasing(x); });
+  wire('ptrRange', 'ptrVal', function (x) { return x.toFixed(2); }, function (x) { window.__wcIconPhysics.setPointerStrength(x); });
 })();
 </script>
 </body>

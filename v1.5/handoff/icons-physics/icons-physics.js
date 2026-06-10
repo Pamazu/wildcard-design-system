@@ -80,20 +80,30 @@
        MIN_SPEED and MAX_SPEED (sine = ease-in-and-out by construction:
        it accelerates and decelerates smoothly, never jumps), and the
        actual speed LERPS toward that moving target every frame. */
-    var SPEED_EASE     = 0.035;  // per-frame lerp toward the breathing target — lower = silkier
     var BREATHE_MIN_HZ = 0.05;   // slowest per-tile breathing cycle (~20s)
     var BREATHE_MAX_HZ = 0.11;   // fastest per-tile breathing cycle (~9s)
 
-    /* Live-tunable speed multiplier — 0 = freeze (tiles ease home), 1 =
-       default, >1 = faster. Configure before load:
-         window.WC_ICON_PHYSICS = { speed: 1.5 }
-       or retune live: window.__wcIconPhysics.setSpeed(1.5). */
+    /* Live-tunable knobs — configure before load:
+         window.WC_ICON_PHYSICS = { speed: 1.5, easing: 0.67, pointer: 0.9 }
+       or retune live via window.__wcIconPhysics.setSpeed / setEasing /
+       setPointerStrength.
+       - speed:   0 = freeze (tiles ease home) · 1 = default · >1 faster
+       - easing:  0..1 — 0 = crisp speed changes, 1 = silkiest ease-in/out
+       - pointer: cursor repel strength — 0 = ignore the mouse, 0.9 = default */
     var cfg = window.WC_ICON_PHYSICS || {};
     var speedMul = (typeof cfg.speed === 'number') ? cfg.speed : 1;
+    var ptrStr   = (typeof cfg.pointer === 'number') ? cfg.pointer : 0.9;   // default = the shipped PTR strength
+    var easeAmt  = (typeof cfg.easing === 'number') ? cfg.easing : 0.67;
+    var easeVal  = 0.035;                 // per-frame lerp — recomputed from easeAmt below
+    function applyEasing() {
+      // 0 → 0.30 (near-immediate) … 1 → 0.012 (ultra smooth), exponential map.
+      easeAmt = Math.max(0, Math.min(1, easeAmt));
+      easeVal = 0.30 * Math.pow(0.012 / 0.30, easeAmt);
+    }
+    applyEasing();
 
     /* Input-nudge layer (on top of the ambient drift) — all gentle. */
     var PTR_RADIUS   = 220;   // cursor influence radius (local px)
-    var PTR_STR      = 0.9;   // cursor repel strength (negate for attract)
     var SCROLL_FORCE = 0.004; // scroll-delta → vertical nudge impulse
     var SCROLL_MAX   = 1.2;   // cap on the scroll impulse
     var SCROLL_DECAY = 0.85;  // scroll impulse decay per frame
@@ -147,7 +157,7 @@
         if (!pointer.active) return null;
         var dx = b.x - pointer.lx, dy = b.y - pointer.ly, d = Math.hypot(dx, dy);
         if (d >= PTR_RADIUS || d === 0) return null;
-        var f = PTR_STR * (1 - d / PTR_RADIUS);        // gentle, distance-falloff
+        var f = ptrStr * (1 - d / PTR_RADIUS);         // gentle, distance-falloff
         return { fx: (dx / d) * f, fy: (dy / d) * f };
       },
       function () {                                     // mobile: scroll nudge
@@ -246,7 +256,7 @@
         var target = (MIN_SPEED + (MAX_SPEED - MIN_SPEED) * (0.5 + 0.5 * Math.sin(tphase))) * speedMul;
         var sp = Math.hypot(b.vx, b.vy) || 0.0001;
         var goal = sp > maxNow ? maxNow : target;
-        var ease = sp > maxNow ? 0.15 : SPEED_EASE;   // settle back from nudges a touch quicker
+        var ease = sp > maxNow ? Math.min(0.3, easeVal * 4) : easeVal;   // settle back from nudges a touch quicker
         var eased = sp + (goal - sp) * ease;
         b.vx = b.vx / sp * eased; b.vy = b.vy / sp * eased;
       }
@@ -287,7 +297,11 @@
        the speed live without touching this file. */
     window.__wcIconPhysics = {
       setSpeed: function (x) { speedMul = Math.max(0, +x || 0); },
-      getSpeed: function () { return speedMul; }
+      getSpeed: function () { return speedMul; },
+      setEasing: function (x) { easeAmt = +x || 0; applyEasing(); },
+      getEasing: function () { return easeAmt; },
+      setPointerStrength: function (x) { ptrStr = Math.max(0, +x || 0); },
+      getPointerStrength: function () { return ptrStr; }
     };
 
     /* Rebuild on resize (tile sizes / cluster layout change at breakpoints). */

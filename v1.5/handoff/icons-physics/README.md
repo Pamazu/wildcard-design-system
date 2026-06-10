@@ -53,13 +53,16 @@ ease-in-and-out by construction — smooth acceleration and deceleration),
 and the actual speed lerps toward that moving target every frame
 (`SPEED_EASE`). Input nudges decay back through the same easing.
 
-### Speed control
+### Live controls
 
-- Before load: `window.WC_ICON_PHYSICS = { speed: 1.5 }` (0 = freeze,
-  1 = default).
-- Live: `window.__wcIconPhysics.setSpeed(1.5)` / `.getSpeed()`.
-- The demo page ships a small "Icon speed" slider wired to this hook —
-  it is demo-only chrome; delete its block for production.
+- Before load: `window.WC_ICON_PHYSICS = { speed: 1, easing: 0.67, pointer: 0.9 }`
+  - `speed` — 0 = freeze (tiles ease home), 1 = default, up to ~2.5 lively
+  - `easing` — 0..1: 0 = crisp speed changes, 1 = silkiest ease-in-and-out
+  - `pointer` — cursor repel strength: 0 = ignore the mouse
+- Live: `window.__wcIconPhysics.setSpeed(x)` / `.setEasing(x)` /
+  `.setPointerStrength(x)` (+ matching getters).
+- The demo page ships a small "Tweaks" panel (Speed / Easing / Mouse pull)
+  wired to these hooks — demo-only chrome; delete its block for production.
 
 ## Performance notes
 
