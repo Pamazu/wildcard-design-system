@@ -109,6 +109,9 @@
     var SCROLL_MAX   = 1.2;   // cap on the scroll impulse
     var SCROLL_DECAY = 0.85;  // scroll impulse decay per frame
     var TILT_FORCE   = 0.5;   // device-tilt "gravity" magnitude
+    var TILT_REST    = 45;    // front-back angle (deg) treated as the NEUTRAL hold —
+                              // a phone held naturally sits tilted back ~45°, not flat,
+                              // so 45° = zero gravity; tilt past/under it pushes the tiles.
     var MAX_NUDGE    = 1.8;   // speed ceiling while an input is active (~108px/s)
 
     /* Square tiles → axis-aligned box collisions (perfect no-overlap).
@@ -200,8 +203,11 @@
        unsupported / denied / non-HTTPS. */
     function onOrient(e) {
       if (e == null || e.gamma == null || e.beta == null) return;
+      // gamma = left-right tilt (neutral at 0, level side to side).
+      // beta  = front-back tilt; re-centered on TILT_REST so the natural
+      // ~45°-back hold reads as neutral, not the flat-on-a-table 0°.
       tilt.gx = Math.max(-1, Math.min(1, e.gamma / 45)) * TILT_FORCE;
-      tilt.gy = Math.max(-1, Math.min(1, e.beta  / 45)) * TILT_FORCE;
+      tilt.gy = Math.max(-1, Math.min(1, (e.beta - TILT_REST) / 45)) * TILT_FORCE;
       tilt.active = true;
     }
     (function enableTilt() {

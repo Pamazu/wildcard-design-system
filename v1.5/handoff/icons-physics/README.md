@@ -35,7 +35,8 @@ never blocks clicks.
   in the JS for free-floating pieces).
 - Inputs nudge, never fling: cursor pushes nearby tiles aside (desktop),
   scroll speed adds vertical inertia, device tilt adds gentle gravity
-  (iOS asks permission on first tap; no-op if denied).
+  (iOS asks permission on first tap; no-op if denied). The tilt NEUTRAL
+  point is a natural ~45°-back hold (`TILT_REST`), not flat-on-a-table.
 - `prefers-reduced-motion: reduce` → the animation never starts and the
   lattice renders fully static. Reacts live to OS-setting changes.
 - Window resize rebuilds the sim, so responsive tile sizes are safe.

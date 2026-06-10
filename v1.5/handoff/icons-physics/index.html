@@ -79,6 +79,9 @@
   .demo-tweaks label span { color: var(--wc-yellow); font-variant-numeric: tabular-nums; }
   .demo-tweaks input[type="range"] { width: 100%; accent-color: var(--wc-yellow); cursor: pointer; }
   .demo-tweaks small { display: block; margin-top: 8px; font-family: var(--font-body); color: rgba(253, 243, 241, 0.45); font-size: 11px; line-height: 1.4; }
+  /* Hide the desktop Tweaks panel on mobile (cursor/precision control has no
+     place on touch; the device-tilt input takes over there). */
+  @media (max-width: 768px) { .demo-tweaks { display: none; } }
 </style>
 </head>
 <body>
