@@ -59,8 +59,19 @@
   }
   .spacer { position: relative; background: var(--wc-black); padding: 96px 24px; text-align: center; font-family: var(--font-body); font-size: 14px; color: rgba(253, 243, 241, 0.4); }
   .try-it { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 52px; }
-  .try-it span { font-family: var(--font-body); font-size: 13px; font-weight: 600; color: rgba(253, 243, 241, 0.78); border: 1px solid rgba(253, 243, 241, 0.22); border-radius: 999px; padding: 9px 18px; }
-  .try-it span b { color: var(--wc-yellow); font-weight: 700; }
+  .try-it > span { display: inline-flex; align-items: center; gap: 9px; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: rgba(253, 243, 241, 0.78); border: 1px solid rgba(253, 243, 241, 0.22); border-radius: 999px; padding: 9px 18px; }
+  .try-it b { color: var(--wc-yellow); font-weight: 700; }
+  .try-it svg { width: 15px; height: 15px; flex: none; color: var(--wc-yellow); }
+  /* Scroll hints — subtle bobbing arrows (Bootstrap Icons chevrons).
+     Gated on the reduced-motion body class like every other animation. */
+  .scroll-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(253, 243, 241, 0.55); }
+  .scroll-hint svg { width: 22px; height: 22px; display: block; }
+  .scroll-up-hint { display: flex; flex-direction: column; align-items: center; gap: 10px; color: rgba(253, 243, 241, 0.6); }
+  .scroll-up-hint svg { width: 22px; height: 22px; }
+  @keyframes wc-bob-down { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+  @keyframes wc-bob-up   { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  body:not(.wcanim-no-motion) .scroll-hint svg { animation: wc-bob-down 2.2s ease-in-out infinite; }
+  body:not(.wcanim-no-motion) .scroll-up-hint svg { animation: wc-bob-up 2.2s ease-in-out infinite; }
   .spacer div { height: 60vh; }
   /* Demo-only tweak panel — design-iteration chrome, NOT part of the handoff. */
   .demo-tweaks { position: fixed; right: 20px; bottom: 20px; z-index: 10; width: 232px; background: rgba(27, 26, 23, 0.92); border: 1px solid rgba(245, 172, 83, 0.35); border-radius: 12px; padding: 16px; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35); }
@@ -112,15 +123,29 @@
 
   <!-- How to test it — explicit interaction hints -->
   <div class="try-it" aria-hidden="true">
-    <span><b>Glide</b> the cursor through the tiles</span>
-    <span><b>Scroll</b> down, then back up</span>
-    <span><b>Tilt</b> your phone</span>
+    <span><svg class="try-ico" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"  fill="currentColor" class="bi bi-cursor" viewBox="0 0 16 16">
+  <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52z"/>
+</svg><span class="txt"><b>Glide</b> the cursor through the tiles</span></span>
+    <span><svg class="try-ico" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"  fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5m-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5"/>
+</svg><span class="txt"><b>Scroll</b> down, then back up</span></span>
+    <span><svg class="try-ico" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"  fill="currentColor" class="bi bi-phone-flip" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M11 1H5a1 1 0 0 0-1 1v6a.5.5 0 0 1-1 0V2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6a.5.5 0 0 1-1 0V2a1 1 0 0 0-1-1m1 13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2a.5.5 0 0 0-1 0v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2a.5.5 0 0 0-1 0zM1.713 7.954a.5.5 0 1 0-.419-.908c-.347.16-.654.348-.882.57C.184 7.842 0 8.139 0 8.5c0 .546.408.94.823 1.201.44.278 1.043.51 1.745.696C3.978 10.773 5.898 11 8 11q.148 0 .294-.002l-1.148 1.148a.5.5 0 0 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2a.5.5 0 1 0-.708.708l1.145 1.144L8 10c-2.04 0-3.87-.221-5.174-.569-.656-.175-1.151-.374-1.47-.575C1.012 8.639 1 8.506 1 8.5c0-.003 0-.059.112-.17.115-.112.31-.242.6-.376Zm12.993-.908a.5.5 0 0 0-.419.908c.292.134.486.264.6.377.113.11.113.166.113.169s0 .065-.13.187c-.132.122-.352.26-.677.4-.645.28-1.596.523-2.763.687a.5.5 0 0 0 .14.99c1.212-.17 2.26-.43 3.02-.758.38-.164.713-.357.96-.587.246-.229.45-.537.45-.919 0-.362-.184-.66-.412-.883s-.535-.411-.882-.571M7.5 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1z"/>
+</svg><span class="txt"><b>Tilt</b> your phone</span></span>
   </div>
+
+  <!-- Scroll-down hint -->
+  <div class="scroll-hint"><svg class="hint-ico" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"  fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+</svg></div>
 </section>
 
 <div class="spacer">
-  scroll &mdash; the tiles pick up a gentle vertical inertia
+  the tiles pick up a gentle vertical inertia as you scroll
   <div></div>
+  <div class="scroll-up-hint"><svg class="hint-ico" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"  fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+</svg>scroll back up</div>
 </div>
 
 <script src="icons-physics.js"></script>
